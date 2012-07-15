@@ -1,8 +1,9 @@
-module.exports = {
-        'test' : function() {
-                console.log('test');
-        },
+/**
+ * @author 57uff3r@gmail.com
+ * @see https://github.com/57uff3r/nodejs-vksdk
+ */
 
+module.exports = {
         'init' : function(appID, appSecret) {
                 this.appID      = appID;
                 this.appSecret  = appSecret;
