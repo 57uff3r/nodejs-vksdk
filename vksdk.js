@@ -3,6 +3,7 @@
  * @see https://github.com/57uff3r/nodejs-vksdk
  */
 
+
 module.exports = {
         'init' : function(appID, appSecret) {
                 this.appID      = appID;
@@ -11,7 +12,7 @@ module.exports = {
                 this.http       = require('http');
         },
 
-        'request' : function(method, params, callback) {         
+        'request' : function(method, params, callback) {
                 this.callback = callback;
                 params.api_id           = this.appID;
                 params.v                = '3.0';
@@ -26,14 +27,16 @@ module.exports = {
                         sig = sig + key + '=' + params[key];
                 }
                 sig             = sig + this.appSecret;
-                params.sig      = this.crypto.createHash('md5').update(sig).digest('hex');
+                params.sig      = this.crypto.createHash('md5').update(sig, 'utf8').digest('hex');
+
 
                 var requestArray = new Array();
                 for(key in params) {
-                        requestArray.push(key + '=' + params[key]);
+                    if( key == "message" ) requestArray.push(key + '=' + encodeURIComponent(params[key]) );
+					else requestArray.push(key + '=' + (params[key]) );
                 }
                 var requestString = this._implode('&', requestArray);
-                
+
                 var options = {
                         host: 'api.vk.com',
                         port: 80,
@@ -42,23 +45,23 @@ module.exports = {
                 this.http.get(options, function(res) {
                         var apiResponse = new String();
                         res.setEncoding('utf8');
-                        
+
                         res.on('data', function(chunk) {
                                 apiResponse += chunk;
                         });
-                        
+
                         res.on('end',  function() {
                                 var o = JSON.parse(apiResponse);
                                 module.exports.callback(o);
                         });
-                                             
+
                 });
         },
 
         '_implode' : function implode( glue, pieces ) {
                 return ( ( pieces instanceof Array ) ? pieces.join ( glue ) : pieces );
         },
-        
+
         '_sortObjectByKey' : function (o) {
                 var sorted = {},
                 key, a = [];
@@ -68,12 +71,12 @@ module.exports = {
                                 a.push(key);
                         }
                 }
-                
+
                 a.sort();
 
                 for (key = 0; key < a.length; key++) {
                         sorted[a[key]] = o[a[key]];
                 }
                 return sorted;
-        }        
+        }
 };
