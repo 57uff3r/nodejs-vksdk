@@ -9,13 +9,13 @@ var     util            = require('util');
         EventEmitter    = require('events').EventEmitter,
         https           = require('https');
 
-var VK = function(_appID, _appSecret, _token, _code) {
+var VK = function(_appID, _appSecret, _token) {
     var self = this;
 
     self.appID         = _appID;
     self.appSecret     = _appSecret;
-    self.code          = _code;
     self.token         = _token;
+  
     
     self.getCurrentToken = function() {
         return self.token;
@@ -26,27 +26,23 @@ var VK = function(_appID, _appSecret, _token, _code) {
         var options = {
                 host: 'api.vk.com',
                 path: '/method/' + _method + '?' +
-                        'uids=29894' + '&access_token=' + self.token
+                        'cids=1' + '&access_token=' + self.token
         };
         
-        try {
-            https.get(options, function(res) {
-                    var apiResponse = new String();
-                    res.setEncoding('utf8');
+        https.get(options, function(res) {
+                var apiResponse = new String();
+                res.setEncoding('utf8');
 
-                    res.on('data', function(chunk) {
-                            apiResponse += chunk;
-                    });                   
+                res.on('data', function(chunk) {
+                        apiResponse += chunk;
+                });                   
 
-                    res.on('end',  function() {
-                         var o = JSON.parse(apiResponse);
-                         self.emit('done:' + _method, o);
-                    });
-                    //res.end();
-            });          
-        } catch(err) {
-            console.log(err);
-        }       
+                res.on('end',  function() {
+                     var o = JSON.parse(apiResponse);
+                     self.emit('done:' + _method, o);
+                });
+                //res.end();
+        });             
         
     };
     
@@ -54,15 +50,14 @@ var VK = function(_appID, _appSecret, _token, _code) {
     self._getTokenFromServer = function() {
         
         var options = {
-                host: 'oauth.vk.com',
+                host: 'api.vk.com',
                 port: 443,
-                path: '/access_token?client_id=' + self.appID +
+                path: '/oauth/access_token?client_id=' + self.appID +
                     '&client_secret=' + self.appSecret + 
                     '&grant_type=client_credentials'
         };
         https.get(options, function(res) {
-                console.log('STATUS: ' + res.statusCode);
-                console.log('HEADERS: ' + JSON.stringify(res.headers));            
+            
                 var apiResponse = new String();
                 res.setEncoding('utf8');
 
@@ -87,9 +82,7 @@ var VK = function(_appID, _appSecret, _token, _code) {
     
     if (!self.token) {
         self._getTokenFromServer();
-    } else {
-        self.emit('ready');
-    }
+    } 
 
 };
 
