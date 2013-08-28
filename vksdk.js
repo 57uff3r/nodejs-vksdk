@@ -35,7 +35,7 @@ var VK = function(_options) {
      */
     self.request = function(_method, _requestParams, _eventName) {
         if (self.options.mode === 'sig')        self._sigRequest(_method, _requestParams, _eventName);
-        else if (self.options.mode === 'oauth') self.oauthRequest(_method, _requestParams, _eventName);
+        else if (self.options.mode === 'oauth') self._oauthRequest(_method, _requestParams, _eventName);
         else throw 'nodejs-vk-sdk: you have to specify sdk work mode (sig or oauth) before requests.';
     };
     
@@ -61,7 +61,7 @@ var VK = function(_options) {
             if (_param.token) {
                 self.token = _param.token;
             } else if (_param.code) {
-
+                self._setUpTokenByCode(_param.code);
             }            
         } else {
             self._setUpAppServerToken();
@@ -75,6 +75,42 @@ var VK = function(_options) {
     self.getToken = function() {
         return self.token;
     };
+    
+    /**
+     * Установка токена через код
+     * @param {string} _code код на получение токена
+     * @returns {undefined}
+     */
+    self._setUpTokenByCode = function(_code) {
+        var options = {
+            host: 'oauth.vk.com',
+            port: 443,
+            path: '/access_token?client_id=' + self.options.appID +
+                '&client_secret=' + self.options.appSecret + 
+                '&code=' + _code
+        };
+       
+        https.get(options, function(res) {
+            
+            var apiResponse = new String();
+            res.setEncoding('utf8');
+
+            res.on('data', function(chunk) {
+                apiResponse += chunk;
+            });
+
+            res.on('end',  function() {
+                var o = JSON.parse(apiResponse);
+                if (!o.access_token) { self.emit('tokenByCodeNotReady', o);
+
+                } else { 
+                    self.token = o.access_token;
+                    self.emit('tokenByCodeReady');
+                }
+            });
+
+        });         
+    };    
     
     /**
      * Установка токена для сервера приложений
@@ -108,6 +144,43 @@ var VK = function(_options) {
             });
 
         });         
+    };
+    
+    /**
+     * Выполнение запроса через outh
+     * @param {string} _method метод API для вызова
+     * @param {mixed} _params object или null (или undef), параметры запроса к API
+     * @param {mixed} _eventName string или null (или undef), кастомное имя генерируемого события
+     * @returns {undefined}
+     */   
+    self._oauthRequest = function(_method, _params, _eventName) {
+        //console.log(self.token);
+        var options = {
+            host: 'api.vk.com',
+            port: 443,
+            path: '/method/' + _method + '?' +
+                'access_token=' + self.token
+        };
+       
+        for(key in _params) {
+            options.path += ('&' + key + '=' + _params[key]);
+        }
+        
+        https.get(options, function(res) {
+            var apiResponse = new String();
+            res.setEncoding('utf8');
+
+            res.on('data', function(chunk) {
+                apiResponse += chunk;
+            });
+
+            res.on('end',  function() {
+                var o = JSON.parse(apiResponse);
+                if (!_eventName) self.emit('done:' + _method, o);
+                else self.emit(_eventName, o);
+            });
+
+        });
     };
     
     /**
@@ -155,7 +228,8 @@ var VK = function(_options) {
 
             res.on('end',  function() {
                 var o = JSON.parse(apiResponse);
-                self.emit('done:' + _method, o);
+                if (!_eventName) self.emit('done:' + _method, o);
+                else self.emit(_eventName, o);
             });
         });
         
