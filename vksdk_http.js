@@ -1,4 +1,7 @@
 /**
+ * 
+ * SDK для предыдущих версий API (без поддержки HTTPS)
+ * 
  * @author 57uff3r@gmail.com
  * @see https://github.com/57uff3r/nodejs-vksdk
  */
