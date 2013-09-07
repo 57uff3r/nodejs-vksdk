@@ -193,7 +193,7 @@ var VK = function(_options) {
      */    
     self._sigRequest = function(_method, _params, _eventName) {
 
-        var params              = _params;
+        var params              = (!!_params ? _params : {});
         params.api_id           = self.options.appID;
         params.v                = '3.0';
         params.method           = _method;
