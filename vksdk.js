@@ -1,9 +1,9 @@
 /**
- * 
+ *
  * SDK работы с API vk.com
  * Поддерживает запросы через https (oauth)
  * и через подпись+http (sig)
- * 
+ *
  * @author 57uff3r@gmail.com
  * @see https://github.com/57uff3r/nodejs-vksdk
  * @see http://57uff3r.ru
@@ -18,7 +18,7 @@ var     util            = require('util');
  * Создание нового объекта для связи с API
  * @param {object} _options
  *  - mode  - режим авторизации и выполнения запросов, oauth или sig
- *  - appID - 
+ *  - appID -
  * @returns {undefined}
  */
 var VK = function(_options) {
@@ -26,9 +26,9 @@ var VK = function(_options) {
 
     // appID, appSecret, mode (sig, oauth)
     self.options        = _options;
-    
+
     /**
-     * Выполнение запроса 
+     * Выполнение запроса
      * @param {string} _method метод API для вызова
      * @param {mixed} _requestParams object или null (или undef), параметры запроса к API
      * @param {mixed} _eventName string или null (или undef), кастомное имя генерируемого события
@@ -39,16 +39,16 @@ var VK = function(_options) {
         else if (self.options.mode === 'oauth') self._oauthRequest(_method, _requestParams, _eventName);
         else throw 'nodejs-vk-sdk: you have to specify sdk work mode (sig or oauth) before requests.';
     };
-    
+
     /**
-     * Изменить режим работы SDK 
+     * Изменить режим работы SDK
      * @param {string} _mode sig или outh
      * @returns {undefined}
      */
     self.changeMode = function(_mode) {
         self.mode = _mode;
     };
-    
+
     /**
      * Обновления токена доступа для работы через oauth
      * @param {mixed} _param
@@ -63,12 +63,12 @@ var VK = function(_options) {
                 self.token = _param.token;
             } else if (_param.code) {
                 self._setUpTokenByCode(_param.code);
-            }            
+            }
         } else {
             self._setUpAppServerToken();
         }
     };
-    
+
     /**
      * Вернуть текущий работающий токен
      * @returns {@exp;self@pro;token}
@@ -76,7 +76,7 @@ var VK = function(_options) {
     self.getToken = function() {
         return self.token;
     };
-    
+
     /**
      * Установка токена через код
      * @param {string} _code код на получение токена
@@ -87,12 +87,12 @@ var VK = function(_options) {
             host: 'oauth.vk.com',
             port: 443,
             path: '/access_token?client_id=' + self.options.appID +
-                '&client_secret=' + self.options.appSecret + 
+                '&client_secret=' + self.options.appSecret +
                 '&code=' + _code
         };
-       
+
         https.get(options, function(res) {
-            
+
             var apiResponse = new String();
             res.setEncoding('utf8');
 
@@ -104,15 +104,15 @@ var VK = function(_options) {
                 var o = JSON.parse(apiResponse);
                 if (!o.access_token) { self.emit('tokenByCodeNotReady', o);
 
-                } else { 
+                } else {
                     self.token = o.access_token;
                     self.emit('tokenByCodeReady');
                 }
             });
 
-        });         
-    };    
-    
+        });
+    };
+
     /**
      * Установка токена для сервера приложений
      * @returns {undefined}
@@ -122,11 +122,11 @@ var VK = function(_options) {
             host: 'api.vk.com',
             port: 443,
             path: '/oauth/access_token?client_id=' + self.options.appID +
-                '&client_secret=' + self.options.appSecret + 
+                '&client_secret=' + self.options.appSecret +
                 '&grant_type=client_credentials'
         };
         https.get(options, function(res) {
-            
+
             var apiResponse = new String();
             res.setEncoding('utf8');
 
@@ -138,22 +138,22 @@ var VK = function(_options) {
                 var o = JSON.parse(apiResponse);
                 if (o.error) { self.emit('appServerTokenNotReady', o);
 
-                } else { 
+                } else {
                     self.token = o.access_token;
                     self.emit('appServerTokenReady');
                 }
             });
 
-        });         
+        });
     };
-    
+
     /**
      * Выполнение запроса через outh
      * @param {string} _method метод API для вызова
      * @param {mixed} _params object или null (или undef), параметры запроса к API
      * @param {mixed} _eventName string или null (или undef), кастомное имя генерируемого события
      * @returns {undefined}
-     */   
+     */
     self._oauthRequest = function(_method, _params, _eventName) {
         //console.log(self.token);
         var options = {
@@ -162,11 +162,11 @@ var VK = function(_options) {
             path: '/method/' + _method + '?' +
                 'access_token=' + self.token
         };
-       
-        for(key in _params) {
+
+        for(var key in _params) {
             options.path += ('&' + key + '=' + _params[key]);
         }
-        
+
         https.get(options, function(res) {
             var apiResponse = new String();
             res.setEncoding('utf8');
@@ -183,14 +183,14 @@ var VK = function(_options) {
 
         });
     };
-    
+
     /**
      * Выполнение запроса через подпись + http
      * @param {string} _method метод API для вызова
      * @param {mixed} _params object или null (или undef), параметры запроса к API
      * @param {mixed} _eventName string или null (или undef), кастомное имя генерируемого события
      * @returns {undefined}
-     */    
+     */
     self._sigRequest = function(_method, _params, _eventName) {
 
         var params              = (!!_params ? _params : {});
@@ -203,7 +203,7 @@ var VK = function(_options) {
 
         params  = this._sortObjectByKey(params);
         var sig = '';
-        for(key in params) {
+        for(var key in params) {
             sig = sig + key + '=' + params[key];
         }
         sig             = sig + self.options.appSecret;
@@ -211,7 +211,7 @@ var VK = function(_options) {
 
 
         var requestArray = new Array();
-        for(key in params) requestArray.push(key + '=' + (params[key]) );
+        for(var key in params) requestArray.push(key + '=' + (params[key]) );
         var requestString = this._implode('&', requestArray);
 
         var options = {
@@ -233,7 +233,7 @@ var VK = function(_options) {
                 else self.emit(_eventName, o);
             });
         });
-        
+
     };
 
     /**
@@ -263,7 +263,7 @@ var VK = function(_options) {
 
         a.sort();
 
-        for (key = 0; key < a.length; key++) {
+        for (var key = 0; key < a.length; key++) {
             sorted[a[key]] = o[a[key]];
         }
         return sorted;
