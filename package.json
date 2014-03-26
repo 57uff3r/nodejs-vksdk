@@ -1,0 +1,8 @@
+{
+    "name"          : "vksdk",
+    "description"   : "SDK for API of vk.com",
+    "version"       : "3.0.0",
+    "homepage"      : "https://github.com/57uff3r/nodejs-vksdk",
+    "email"         : "57uff3r@gmail.com",
+    "license"       : "BSD-3-Clause"
+}
