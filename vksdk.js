@@ -164,7 +164,11 @@ var VK = function(_options) {
         };
 
         for(var key in _params) {
-            options.path += ('&' + key + '=' + _params[key]);
+            if( key === "message" ) {
+                options.path += ('&' + key + '=' + encodeURIComponent(_params[key]);
+            } else {
+                options.path += ('&' + key + '=' + _params[key]);
+            }
         }
 
         https.get(options, function(res) {
@@ -211,7 +215,13 @@ var VK = function(_options) {
 
 
         var requestArray = new Array();
-        for(var key in params) requestArray.push(key + '=' + (params[key]) );
+        for(var key in params) {
+            if( key === "message" )  {
+                requestArray.push(key + '=' + encodeURIComponent(params[key]) );
+            } else {
+                requestArray.push(key + '=' + (params[key]) );
+            }
+        }
         var requestString = this._implode('&', requestArray);
 
         var options = {
