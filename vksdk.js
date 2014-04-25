@@ -165,7 +165,7 @@ var VK = function(_options) {
 
         for(var key in _params) {
             if( key === "message" ) {
-                options.path += ('&' + key + '=' + encodeURIComponent(_params[key]);
+                options.path += ('&' + key + '=' + encodeURIComponent(_params[key]));
             } else {
                 options.path += ('&' + key + '=' + _params[key]);
             }
