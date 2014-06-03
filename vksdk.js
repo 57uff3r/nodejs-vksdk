@@ -77,6 +77,44 @@ var VK = function(_options) {
         return self.token;
     };
 
+
+    /**
+     * Get token by login and password
+     *
+     * @param {string} _username vk user username
+     * @param {string} _password vk user password
+     * @returns {undefined}
+     *
+     * @see https://vk.com/dev/auth_direct
+     */
+    self.acquireToken = function(_username, _password) {
+        var options = {
+            host: 'oauth.vk.com',
+            port: 443,
+            path: '/access_token?grant_type=password&client_id=' + self.options.appID +
+                    '&client_secret=' + self.options.appSecret +
+                    '&grant_type=password&scope=notify,friends,photos,audio,video,docs,messages,notifications,offline,wall' +
+                    '&username=' + _username +
+                    '&password=' + _password
+        };
+        https.get(options, function(res) {
+            var apiResponse = new String();
+            res.setEncoding('utf8');
+            res.on('data', function(chunk) {
+                apiResponse += chunk;
+            });
+            res.on('end', function() {
+                var o = JSON.parse(apiResponse);
+                if (!o.access_token) {
+                    self.emit('acquireTokenNotReady', o);
+                } else {
+                    self.token = o.access_token;
+                    self.emit('acquireTokenReady');
+                }
+            });
+        });
+    };
+
     /**
      * Установка токена через код
      * @param {string} _code код на получение токена
