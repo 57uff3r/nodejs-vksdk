@@ -1,8 +1,6 @@
 /**
  *
- * SDK работы с API vk.com
- * Поддерживает запросы через https (oauth)
- * и через подпись+http (sig)
+ * SDK for  vk.com API
  *
  * @author 57uff3r@gmail.com
  * @see https://github.com/57uff3r/nodejs-vksdk
@@ -15,9 +13,9 @@ var     util            = require('util');
         https           = require('https');
 
 /**
- * Создание нового объекта для связи с API
+ * Create new SDK object
  * @param {object} _options
- *  - mode  - режим авторизации и выполнения запросов, oauth или sig
+ *  - mode  - auth mode (oauth or sig)
  *  - appID -
  * @returns {undefined}
  */
@@ -28,10 +26,10 @@ var VK = function(_options) {
     self.options        = _options;
 
     /**
-     * Выполнение запроса
-     * @param {string} _method метод API для вызова
-     * @param {mixed} _requestParams object или null (или undef), параметры запроса к API
-     * @param {mixed} _eventName string или null (или undef), кастомное имя генерируемого события
+     * APi method request
+     * @param {string} _method APi method name
+     * @param {mixed} _requestParams object or null (or undef), API method params
+     * @param {mixed} _eventName string or null (или undef), custom event name
      * @returns {undefined}
      */
     self.request = function(_method, _requestParams, _eventName) {
@@ -41,8 +39,8 @@ var VK = function(_options) {
     };
 
     /**
-     * Изменить режим работы SDK
-     * @param {string} _mode sig или outh
+     * Change SDK request mode
+     * @param {string} _mode sig or outh
      * @returns {undefined}
      */
     self.changeMode = function(_mode) {
@@ -50,11 +48,11 @@ var VK = function(_options) {
     };
 
     /**
-     * Обновления токена доступа для работы через oauth
+     * Update oauth token
      * @param {mixed} _param
-     *     при пустом значении создается токен для сервера приложений
-     *     { code : string }  - создается токен на основе кода
-     *     { token : string }  - токен устанавливается напрямую
+     *     empty  - for server-side api requests
+     *     { code : string }  - obtain token with code
+     *     { token : string }  - setup token manually
      * @returns {undefined}
      */
     self.setToken = function(_param) {
@@ -70,8 +68,8 @@ var VK = function(_options) {
     };
 
     /**
-     * Вернуть текущий работающий токен
-     * @returns {@exp;self@pro;token}
+     * Get current token
+     * @returns {string}
      */
     self.getToken = function() {
         return self.token;
@@ -116,8 +114,8 @@ var VK = function(_options) {
     };
 
     /**
-     * Установка токена через код
-     * @param {string} _code код на получение токена
+     * Obtain token with code
+     * @param {string} _code
      * @returns {undefined}
      */
     self._setUpTokenByCode = function(_code) {
@@ -152,7 +150,7 @@ var VK = function(_options) {
     };
 
     /**
-     * Установка токена для сервера приложений
+     * Obtain server-side token
      * @returns {undefined}
      */
     self._setUpAppServerToken = function() {
@@ -186,10 +184,10 @@ var VK = function(_options) {
     };
 
     /**
-     * Выполнение запроса через outh
-     * @param {string} _method метод API для вызова
-     * @param {mixed} _params object или null (или undef), параметры запроса к API
-     * @param {mixed} _eventName string или null (или undef), кастомное имя генерируемого события
+     * Outh api request
+     * @param {string} _method
+     * @param {mixed} _params
+     * @param {mixed} _eventName
      * @returns {undefined}
      */
     self._oauthRequest = function(_method, _params, _eventName) {
@@ -227,10 +225,10 @@ var VK = function(_options) {
     };
 
     /**
-     * Выполнение запроса через подпись + http
-     * @param {string} _method метод API для вызова
-     * @param {mixed} _params object или null (или undef), параметры запроса к API
-     * @param {mixed} _eventName string или null (или undef), кастомное имя генерируемого события
+     * Request API method with signature
+     * @param {string} _method
+     * @param {mixed} _params
+     * @param {mixed} _eventName
      * @returns {undefined}
      */
     self._sigRequest = function(_method, _params, _eventName) {
@@ -285,9 +283,9 @@ var VK = function(_options) {
     };
 
     /**
-     * Склейка массива в строку с помощью разделителя
-     * @param {string} glue разделитель для склеенной строки
-     * @param {array} pieces данные для склейки
+     * Implode array to string
+     * @param {string} glue
+     * @param {array} pieces
      * @returns {@exp;pieces@call;join|@exp;@exp;pieces@call;joinpieces|VK.implode.pieces}
      */
     self._implode  = function implode( glue, pieces ) {
@@ -295,8 +293,8 @@ var VK = function(_options) {
     };
 
     /**
-     * Сортировка свойств объекта по имена
-     * @param {object} o Объект для сортировки
+     * Sort object properties by name
+     * @param {object} o
      * @returns {object}
      */
     self._sortObjectByKey = function (o) {
