@@ -1,39 +1,25 @@
 nodejs-vksdk
 ============
 
-Простой SDK для выполнения запросов к API социальной сети «ВКонтакте».
+Small SDK for vk.com API.
 
-АХТУНГ
-====================
-
-В репо пару дней будут идти правки, качайте код из релизов
-https://github.com/57uff3r/nodejs-vksdk/releases
-
-Прошу прощения за бардак :)
-
-
-
-NOTE
+Installation
 -------
-Появилось время, вношу правки в SDK, добавляю фичи, оформляю npm — делаю все то, что уже давно надо было :)
 
-Установка
+    npm install vksdk
+
+Usage
 -------
-Скачайте SDK https://github.com/57uff3r/nodejs-vksdk/releases
-Просто скопируйте файл vksdk.js в свой проект и подключите.
-
 ```js
-var VK = require('./vksdk.js');
+var VK = require('vksdk');
 ```
 
-Настройка
--------
-Поддерживается два способа авторизации и отправки запросов.
+You can use two ways of performing API requests:
 
-* sig (через подпись, по http) (http://vk.com/developers.php?oid=-1&p=%D0%92%D0%B7%D0%B0%D0%B8%D0%BC%D0%BE%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2%D0%B8%D0%B5_%D1%81_API_%D0%B1%D0%B5%D0%B7_HTTPS)
-* oauth, через https (http://vk.com/developers.php?oid=-1&p=%D0%92%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B7%D0%B0%D0%BF%D1%80%D0%BE%D1%81%D0%BE%D0%B2_%D0%BA_API)
+* [sig (with signature and http)](http://vk.com/pages?oid=-17680044&p=Application_Interaction_with_API)
+* token (oauth or direct token request)
 
-SDK предоставляет оба способа, можно выбрать при инициализации.
+This SDK provides both ways:
 
 ```js
 var vk = new VK({
@@ -51,7 +37,7 @@ var vk = new VK({
 });
 ```
 
-При необходимости режим выполнения запросов меняется в любой момент:
+You also can change request mode 'on-fly':
 
 ```js
 vk.changeMode('oauth');
@@ -62,55 +48,47 @@ vk.changeMode('oauth');
 vk.changeMode('sig');
 ```
 
-Авторизация через sig
+Signature auth
 -------
-Специальная авторизация не требуется, достаточно appID и appSecret
+You need just your appID и appSecret.
 
 
-Авторизация через oauth
+Token auth
 -------
-Для выполнения запросов нужен токен.
+You need token to perform api requests.
 
-Можно заставить SDK автоматически запросить токен. Полученный токен — это авторизация
-сервера приложений. С ним можно выполнять некоторые операции, не касающиеся
-пользовательских данных. Например, secure.getAppBalance или secure.sendNotification.
+SDK can automaticly provide tokens for server-side applications. With server-side token you
+can perform only limited set of api methods like secure.getAppBalance или secure.sendNotification.
 
-Поскольку токен генерируется не сразу, нужно подождать события.
-* appServerTokenReady — событие успешно полученного токена
-* appServerTokenNotReady — ошибка запроса токена
+SDK has two events for server-side token requests:
+* appServerTokenReady - token is ready
+* appServerTokenNotReady — something was wrong
 
 ```js
 vk.setToken();
 vk.on('appServerTokenReady', function() {
     vk.request('secure.getAppBalance');
-    // и так далее...
+    // etc
 });
 vk.on('appServerTokenNotReady', function(_error) {
-    // обрабатываем ошибку установки токена
+    // error handler
 });
 ```
 
-Можно получить токен через код, отправленный с фронт-енда. Про процесс авторизации
-и код написано здесь: http://vk.com/developers.php?oid=-1&p=%D0%90%D0%B2%D1%82%D0%BE%D1%80%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F_%D1%81%D0%B0%D0%B9%D1%82%D0%BE%D0%B2
-В этом случае SDK возьмет код, обратится с ним к oauth И получит токен,
-с которым и будет выполнять запросы. Получение токена тоже занимает время,
-поэтому нужно подождать событий. Это токен позволяет запрашивать данные
-пользователей.
+Second way — get token for client API requests with [special code from your fron-end](http://vk.com/developers.php?oid=-1&p=%D0%90%D0%B2%D1%82%D0%BE%D1%80%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F_%D1%81%D0%B0%D0%B9%D1%82%D0%BE%D0%B2).
 
 ```js
 vk.setToken({ code : '0819c207b9933a' });
 vk.on('tokenByCodeReady', function() {
     vk.request('getProfiles', {'uids' : '29894'});
-    // и так далее...
+    // etc...
 });
 vk.on('tokenByCodeNotReady', function(_error) {
-    // обрабатываем ошибку установки токена
+    // error handler
 });
 ```
 
-Третий способ — задать токен напрямую. Токен можно получить с фронт-енда или использовать
-ранее полученный токен. Здесь дожидаться событий не нужно — токен задается сразу.
-
+Third way — get token directly from your application in customers browser.
 ```js
 vk.setToken( { token :'f1eebc4311e775b128183993ee16302ac036a67af30424238d1oo14d35dfa61896f172ee630b7034a' });
 vk.request('getProfiles', {'uids' : '29894'});
@@ -119,9 +97,20 @@ vk.on('done:getProfiles', function(_o) {
 });
 ```
 
-Запросы
+Fourth way -  get token using customers vk.com login and password.
+```js
+vk.acquireToken('vk_com_login@mail.com', 'password');
+vk.on('appServerTokenReady', function() {
+    vk.request('acquireTokenReady');
+    // etc
+});
+vk.on('acquireTokenNotReady', function(_error) {
+    // error handler
+});
+
+
+Requests
 -------
-Запросы выполняются так:
 
 ```js
 vk.request('getProfiles', {'uids' : '29894'});
@@ -130,12 +119,11 @@ vk.on('done:getProfiles', function(_o) {
 });
 ```
 
-Передаем в request название метода API и параметры. По готовности результата сгенерируется
- событие вида done:methodName. В этом примере запрашивается getProfiles, значит
-событие готовности — done:getProfiles.
+When request resul will be ready,  SDK will fire event with request result.
+Event name will be like  done:methodName. So if you request getProfiles()  SDK will fire
+done:getProfiles event();
 
-Бывает и так, что нужно выполнить несколько однотипных запросов. На каждый запрос
-можно назначить свое имя события (чтобы события не конфликтовали):
+But you can set your custom event name:
 
 
 ```js
@@ -150,28 +138,33 @@ vk.on('myEvent2', function(_o) {
 });
 ```
 
-Мы назначили два события: myEvent1 и myEvent2. С первым придут данные для пользователя
- 29894, со вторым — пользователя 1.
-
-Системные события в SDK
+System events in SDK
 -------
-* tokenByCodeReady — получен токен по коду
-* tokenByCodeNotReady — ошибка получения токена по коду
-* appServerTokenReady — получен токен сервера приложений
-* appServerTokenNotReady — ошибка получения токена сервера приложений
+You can't change the names of this events.
 
-Полный список методов
+* tokenByCodeReady
+* tokenByCodeNotReady
+* appServerTokenReady
+* appServerTokenNotReady
+* acquireTokenReady
+* acquireTokenNotReady
+
+Methods
 -------
-* setToken([params]) — установка токена через код, напрямую или запрос токена с сервера.
-* changeMode(string) — установка режима работы SDK (oauth или sig)
-* getToken() — получить текущий рабочий токен
-* request(methodName, methodParams, [eventName]) — выполнить запрос к методу API, используя параметры (и, возможно, указать кастомное событие)
+* acquireToken(login, password) - request token by login and password
+* setToken([params]) — request token using code from client-side
+* changeMode(string) — set up request mode (oauth or sig)
+* getToken() — get current token
+* request(methodName, methodParams, [eventName]) — request API method
 
-В SDK доступны все методы из events.EventEmitter (http://nodejs.org/api/events.html)
+SDK provides all methods from [events.EventEmitter](http://nodejs.org/api/events.html)
 
-Поддержка
+Support
 -------
 * 57uff3r@gmail.com
+* skype: andrey.korchak
 * http://57uff3r.ru
 * http://vk.com/s7uff3r
-* Дополнительно: база данных городов и стран vk.com http://citieslist.ru/
+
+
+See  also vk.com [cities and counties DB](http://citieslist.ru/)
