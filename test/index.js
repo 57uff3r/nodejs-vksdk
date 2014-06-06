@@ -13,7 +13,7 @@ var done = function(_o) {
 };
 
 describe('api', function() {
-    this.timeout(15000);
+    this.timeout(20000);
 
     it('Should load a user profile', function(done) {
       assert.doesNotThrow(function() {
