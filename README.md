@@ -2,6 +2,7 @@ nodejs-vksdk
 ============
 
 Small SDK for vk.com API.
+[![Build Status](https://secure.travis-ci.org/57uff3r/nodejs-vksdk.png)](http://travis-ci.org/57uff3r/nodejs-vksdk)
 
 Installation
 -------
