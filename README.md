@@ -2,7 +2,6 @@ nodejs-vksdk
 ============
 
 Small SDK for vk.com API.
-[![Build Status](https://secure.travis-ci.org/57uff3r/nodejs-vksdk.png)](http://travis-ci.org/57uff3r/nodejs-vksdk)
 
 Installation
 -------
@@ -43,7 +42,7 @@ You also can change request mode 'on-fly':
 ```js
 vk.changeMode('oauth');
 ```
-или
+or
 
 ```js
 vk.changeMode('sig');
@@ -51,7 +50,7 @@ vk.changeMode('sig');
 
 Signature auth
 -------
-You need just your appID и appSecret.
+You need just your appID and appSecret.
 
 
 Token auth
@@ -59,7 +58,7 @@ Token auth
 You need token to perform api requests.
 
 SDK can automaticly provide tokens for server-side applications. With server-side token you
-can perform only limited set of api methods like secure.getAppBalance или secure.sendNotification.
+can perform only limited set of api methods like secure.getAppBalance or secure.sendNotification.
 
 SDK has two events for server-side token requests:
 * appServerTokenReady - token is ready
