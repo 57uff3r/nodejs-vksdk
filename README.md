@@ -140,6 +140,21 @@ vk.on('myEvent2', function(_o) {
 });
 ```
 
+Callback
+
+When request result will be ready, SDK will call callback function with request result.
+For this, you need to specify callback with 3rd parameter of request, 
+and 4th parameter must bee string with type of response - 'callback'; 
+
+Example:
+
+```js
+vk.request('getProfiles', {'uids' : '29894'}, function(_o) {
+    console.log(_o);
+}, 'callback');
+
+```
+
 System events in SDK
 -------
 You can't change the names of this events.
@@ -157,7 +172,7 @@ Methods
 * setToken([params]) — request token using code from client-side
 * changeMode(string) — set up request mode (oauth or sig)
 * getToken() — get current token
-* request(methodName, methodParams, [eventName]) — request API method
+* request(methodName, methodParams, [response], responseType) — request API method
 
 SDK provides all methods from [events.EventEmitter](http://nodejs.org/api/events.html)
 
