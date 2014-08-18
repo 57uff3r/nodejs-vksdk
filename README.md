@@ -118,13 +118,15 @@ vk.on('done:getProfiles', function(_o) {
     console.log(_o);
 });
 ```
+There are two ways to get response: event and callback function.
 
-When request resul will be ready,  SDK will fire event with request result.
-Event name will be like  done:methodName. So if you request getProfiles()  SDK will fire
+Event
+
+When request result will be ready, SDK will fire event with request result.
+Event name will be like  done:methodName. So if you request getProfiles() SDK will fire
 done:getProfiles event();
 
 But you can set your custom event name:
-
 
 ```js
 vk.request('getProfiles', {'uids' : '29894'}, 'myEvent1');
