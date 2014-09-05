@@ -26,6 +26,17 @@ describe('api', function() {
       });
     });
 
+    
+    it('Should get response in callback function', function(done) {
+      assert.doesNotThrow(function() {
+
+          vk.request('getProfiles', {'uids' : '29894'}, function(_o) {
+            assert.equal(_o.response[0].uid, 29894);
+            done();
+          }, 'callback');
+      });
+    });
+
 
     it('Should load a country info', function(done) {
       assert.doesNotThrow(function() {

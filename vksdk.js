@@ -29,12 +29,13 @@ var VK = function(_options) {
      * APi method request
      * @param {string} _method APi method name
      * @param {mixed} _requestParams object or null (or undef), API method params
-     * @param {mixed} _eventName string or null (или undef), custom event name
+     * @param {mixed} _response string, function or null (or undef), callback function or custom event name
+     * @param {string} _responseType define type of response callback or event
      * @returns {undefined}
      */
-    self.request = function(_method, _requestParams, _eventName) {
-        if (self.options.mode === 'sig')        self._sigRequest(_method, _requestParams, _eventName);
-        else if (self.options.mode === 'oauth') self._oauthRequest(_method, _requestParams, _eventName);
+    self.request = function(_method, _requestParams, _response, _responseType) {
+        if (self.options.mode === 'sig')        self._sigRequest(_method, _requestParams, _response, _responseType);
+        else if (self.options.mode === 'oauth') self._oauthRequest(_method, _requestParams, _response, _responseType);
         else throw 'nodejs-vk-sdk: you have to specify sdk work mode (sig or oauth) before requests.';
     };
 
@@ -187,11 +188,11 @@ var VK = function(_options) {
      * Outh api request
      * @param {string} _method
      * @param {mixed} _params
-     * @param {mixed} _eventName
+     * @param {mixed} _response
+     * @param {string} _responseType
      * @returns {undefined}
      */
-    self._oauthRequest = function(_method, _params, _eventName) {
-        //console.log(self.token);
+    self._oauthRequest = function(_method, _params, _response, _responseType) {
         var options = {
             host: 'api.vk.com',
             port: 443,
@@ -217,8 +218,12 @@ var VK = function(_options) {
 
             res.on('end',  function() {
                 var o = JSON.parse(apiResponse);
-                if (!_eventName) self.emit('done:' + _method, o);
-                else self.emit(_eventName, o);
+                if (_responseType === 'callback' && typeof _response === 'function') {
+                    _response(o);
+                } else {
+                    if (!_response) self.emit('done:' + _method, o);
+                    else self.emit(_response, o);
+                }
             });
 
         });
@@ -228,10 +233,11 @@ var VK = function(_options) {
      * Request API method with signature
      * @param {string} _method
      * @param {mixed} _params
-     * @param {mixed} _eventName
+     * @param {mixed} _response
+     * @param {string} _responseType
      * @returns {undefined}
      */
-    self._sigRequest = function(_method, _params, _eventName) {
+    self._sigRequest = function(_method, _params, _response, _responseType) {
 
         var params              = (!!_params ? _params : {});
         params.api_id           = self.options.appID;
@@ -275,8 +281,12 @@ var VK = function(_options) {
 
             res.on('end',  function() {
                 var o = JSON.parse(apiResponse);
-                if (!_eventName) self.emit('done:' + _method, o);
-                else self.emit(_eventName, o);
+                if (_responseType === 'callback' && typeof _response === 'function') {
+                    _response(o);
+                } else {
+                    if (!_response) self.emit('done:' + _method, o);
+                    else self.emit(_response, o);
+                }
             });
         });
 
@@ -319,6 +329,3 @@ var VK = function(_options) {
 
 util.inherits(VK, EventEmitter);
 module.exports = VK;
-
-
-
