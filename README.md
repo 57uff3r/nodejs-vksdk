@@ -145,15 +145,14 @@ vk.on('myEvent2', function(_o) {
 Callback
 -------
 When request result will be ready, SDK will call callback function with request result.
-For this, you need to specify callback with 3rd parameter of request, 
-and 4th parameter must bee string with type of response - 'callback'; 
+For this, you need to specify callback with 3rd parameter of request.
 
 Example:
 
 ```js
 vk.request('getProfiles', {'uids' : '29894'}, function(_o) {
     console.log(_o);
-}, 'callback');
+});
 
 ```
 

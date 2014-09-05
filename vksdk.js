@@ -33,10 +33,20 @@ var VK = function(_options) {
      * @param {string} _responseType define type of response callback or event
      * @returns {undefined}
      */
-    self.request = function(_method, _requestParams, _response, _responseType) {
-        if (self.options.mode === 'sig')        self._sigRequest(_method, _requestParams, _response, _responseType);
-        else if (self.options.mode === 'oauth') self._oauthRequest(_method, _requestParams, _response, _responseType);
-        else throw 'nodejs-vk-sdk: you have to specify sdk work mode (sig or oauth) before requests.';
+    self.request = function(_method, _requestParams, _response) {
+        var responseType = 'event';
+
+        if ( typeof(_response) === 'function') {
+            responseType = 'callback';
+        }
+
+        if (self.options.mode === 'sig') {
+            self._sigRequest(_method, _requestParams, _response, responseType);
+        } else if (self.options.mode === 'oauth') {
+            self._oauthRequest(_method, _requestParams, _response, responseType);
+        } else {
+            throw 'nodejs-vk-sdk: you have to specify sdk work mode (sig or oauth) before requests.';
+        }
     };
 
     /**
