@@ -48,6 +48,24 @@ or
 vk.changeMode('sig');
 ```
 
+### How to setup version of API and language
+
+By default used API version 3.0 and Russian language.
+
+You may setup [latest version](https://vk.com/dev/versions) of vk.com API and change language.
+
+```js
+var vk = new VK({
+    'appID'     : 2807970,
+    'appSecret' : 'L1ZKpgQPalJdumI6vFK',
+    'mode'      : 'oauth',
+    'version'   : '5.26',
+    'language'  : 'en'
+});
+
+```
+
+
 Signature auth
 -------
 You need just your appID and appSecret.
