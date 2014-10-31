@@ -259,8 +259,8 @@ var VK = function(_options) {
 
         var params              = (!!_params ? _params : {});
         params.api_id           = self.options.appID;
-        params.v                = _params['v'] || self.options.version ||  self.default.version;
-        params.lang             = _params['lang'] || self.options.language ||  self.default.language,
+        params.v                = ('v' in params) ? params['v'] : self.options.version ||  self.default.version;
+        params.lang             = ('lang' in params) ? params['lang'] :  self.options.language ||  self.default.language,
         params.method           = _method;
         params.timestamp        = new Date().getTime();
         params.format           = 'json';

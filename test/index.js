@@ -56,7 +56,7 @@ describe('api', function() {
 
         vk.request('secure.getAppBalance', {'cids' : '1,2'});
         vk.on('done:secure.getAppBalance', function(_o) {
-          assert.equal(_o.error.error_code, 150);
+          assert.equal(_o.error.error_code, 500);
           done();
         });
       });
