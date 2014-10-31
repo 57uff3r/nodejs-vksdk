@@ -22,8 +22,14 @@ var     util            = require('util');
 var VK = function(_options) {
     var self = this;
 
-    // appID, appSecret, mode (sig, oauth)
+    // appID, appSecret, mode (sig, oauth), [version], [language]
     self.options        = _options;
+
+    // Default settings
+    self.default = {
+      version: '3.0',
+      language: 'ru'
+    };
 
     /**
      * APi method request
@@ -209,6 +215,8 @@ var VK = function(_options) {
             path: '/method/' + _method + '?' +
                 'access_token=' + self.token
         };
+        _params['v'] = _params['v'] || self.options.version || self.default.version;
+        _params['lang'] = _params['lang'] || self.options.language || self.default.language;
 
         for(var key in _params) {
             if( key === "message" ) {
@@ -251,7 +259,8 @@ var VK = function(_options) {
 
         var params              = (!!_params ? _params : {});
         params.api_id           = self.options.appID;
-        params.v                = self.options.version || '3.0';
+        params.v                = _params['v'] || self.options.version ||  self.default.version;
+        params.lang             = _params['lang'] || self.options.language ||  self.default.language,
         params.method           = _method;
         params.timestamp        = new Date().getTime();
         params.format           = 'json';
