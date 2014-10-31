@@ -48,6 +48,21 @@ or
 vk.changeMode('sig');
 ```
 
+### How to setup version of API
+
+By default used version 3.0, you may setup [latest version](https://vk.com/dev/versions) of vk.com API.
+
+```js
+var vk = new VK({
+    'appID'     : 2807970,
+    'appSecret' : 'L1ZKpgQPalJdumI6vFK',
+    'mode'      : 'oauth',
+    'version'   : '5.26'
+});
+
+```
+
+
 Signature auth
 -------
 You need just your appID and appSecret.

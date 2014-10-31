@@ -251,7 +251,7 @@ var VK = function(_options) {
 
         var params              = (!!_params ? _params : {});
         params.api_id           = self.options.appID;
-        params.v                = '3.0';
+        params.v                = self.options.version || '3.0';
         params.method           = _method;
         params.timestamp        = new Date().getTime();
         params.format           = 'json';
