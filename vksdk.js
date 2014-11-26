@@ -136,12 +136,29 @@ var VK = function(_options) {
      * @returns {undefined}
      */
     self._setUpTokenByCode = function(_code) {
+        var path = '/access_token?';
+        var pathIngredients = {
+                "client_id": self.options.appID,
+                "client_secret": self.options.appSecret,
+                "code": _code
+        };
+
+        if("undefined" !== typeof self.options.redirectUri) {
+            pathIngredients['redirect_uri'] = encodeURI(self.options.redirectUri);
+        }
+
+        var pathAIngredients = [];
+        for(var name in pathIngredients) {
+            var value = pathIngredients[name];
+            pathAIngredients.push(name+'='+value);
+        }
+
+        path += pathAIngredients.join('&');
+
         var options = {
             host: 'oauth.vk.com',
             port: 443,
-            path: '/access_token?client_id=' + self.options.appID +
-                '&client_secret=' + self.options.appSecret +
-                '&code=' + _code
+            path: path
         };
 
         https.get(options, function(res) {
