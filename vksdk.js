@@ -6,11 +6,11 @@
  * @see https://github.com/57uff3r/nodejs-vksdk
  * @see http://57uff3r.ru
  */
-var     util            = require('util');
+var    util           = require('util');
         EventEmitter    = require('events').EventEmitter,
         crypto          = require('crypto'),
         http            = require('http'),
-        https           = require('https');
+        https          = require('https');
 
 /**
  * Create new SDK object
@@ -69,7 +69,7 @@ var VK = function(_options) {
      * @param {mixed} _param
      *     empty  - for server-side api requests
      *     { code : string }  - obtain token with code
-     *     { token : string }  - setup token manually
+     *     { token : string } - setup token manually
      * @returns {undefined}
      */
     self.setToken = function(_param) {
@@ -92,6 +92,22 @@ var VK = function(_options) {
         return self.token;
     };
 
+    /**
+     * Get current user id
+     * @returns {number}
+     */
+    self.getUserId = function() {
+      return self.userId;
+    }
+
+    /**
+     * Get expires in
+     * @returns {number}
+     */
+    self.getExpiresIn = function() {
+      return self.expiresIn;
+    }
+
 
     /**
      * Get token by login and password
@@ -103,14 +119,21 @@ var VK = function(_options) {
      * @see https://vk.com/dev/auth_direct
      */
     self.acquireToken = function(_username, _password) {
+        var path = '/access_token?' + self._buildQuery({
+                "client_id": self.options.appID,
+                "client_secret": self.options.appSecret,
+                "code": _code,
+                'redirect_uri': "undefined" === typeof self.options.redirectUri ? undefined : self.options.redirectUri,
+                'grant_type': 'password',
+                'scope': 'notify,friends,photos,audio,video,docs,messages,notifications,offline,wall',
+                'username': _username,
+                'password': _password
+        });
+
         var options = {
             host: 'oauth.vk.com',
             port: 443,
-            path: '/access_token?grant_type=password&client_id=' + self.options.appID +
-                    '&client_secret=' + self.options.appSecret +
-                    '&grant_type=password&scope=notify,friends,photos,audio,video,docs,messages,notifications,offline,wall' +
-                    '&username=' + _username +
-                    '&password=' + _password
+            path: path
         };
         https.get(options, function(res) {
             var apiResponse = new String();
@@ -136,24 +159,12 @@ var VK = function(_options) {
      * @returns {undefined}
      */
     self._setUpTokenByCode = function(_code) {
-        var path = '/access_token?';
-        var pathIngredients = {
+        var path = '/access_token?' + self._buildQuery({
                 "client_id": self.options.appID,
                 "client_secret": self.options.appSecret,
-                "code": _code
-        };
-
-        if("undefined" !== typeof self.options.redirectUri) {
-            pathIngredients['redirect_uri'] = encodeURI(self.options.redirectUri);
-        }
-
-        var pathAIngredients = [];
-        for(var name in pathIngredients) {
-            var value = pathIngredients[name];
-            pathAIngredients.push(name+'='+value);
-        }
-
-        path += pathAIngredients.join('&');
+                "code": _code,
+                'redirect_uri': "undefined" === typeof self.options.redirectUri ? undefined : self.options.redirectUri
+        });
 
         var options = {
             host: 'oauth.vk.com',
@@ -170,12 +181,14 @@ var VK = function(_options) {
                 apiResponse += chunk;
             });
 
-            res.on('end',  function() {
+            res.on('end', function() {
                 var o = JSON.parse(apiResponse);
-                if (!o.access_token) { self.emit('tokenByCodeNotReady', o);
-
+                if (!o.access_token) {
+                  self.emit('tokenByCodeNotReady', o);
                 } else {
                     self.token = o.access_token;
+                    self.userId = o.user_id;
+                    self.expiresIn = o.expires_in;
                     self.emit('tokenByCodeReady');
                 }
             });
@@ -188,12 +201,16 @@ var VK = function(_options) {
      * @returns {undefined}
      */
     self._setUpAppServerToken = function() {
+        var path = '/oauth/access_token?' + self._buildQuery({
+                "client_id": self.options.appID,
+                "client_secret": self.options.appSecret,
+                "grant_type": "client_credentials"
+        });
+
         var options = {
             host: 'api.vk.com',
             port: 443,
-            path: '/oauth/access_token?client_id=' + self.options.appID +
-                '&client_secret=' + self.options.appSecret +
-                '&grant_type=client_credentials'
+            path: path
         };
         https.get(options, function(res) {
 
@@ -204,7 +221,7 @@ var VK = function(_options) {
                 apiResponse += chunk;
             });
 
-            res.on('end',  function() {
+            res.on('end', function() {
                 var o = JSON.parse(apiResponse);
                 if (o.error) { self.emit('appServerTokenNotReady', o);
 
@@ -226,22 +243,23 @@ var VK = function(_options) {
      * @returns {undefined}
      */
     self._oauthRequest = function(_method, _params, _response, _responseType) {
+        var params = (!!_params ? _params : {});
+        params["access_token"] = self.token;
+        params['v'] = self.options.version || self.default.version;
+        params['lang'] = self.options.language || self.default.language;
+
+        if("undefined" !== typeof _params) {
+          params['v'] = _params['v'] || params['v'];
+          params['lang'] = _params['lang'] || params['lang'];
+        }
+
+        var path = '/method/' + _method + '?' + self._buildQuery(params);
+
         var options = {
             host: 'api.vk.com',
             port: 443,
-            path: '/method/' + _method + '?' +
-                'access_token=' + self.token
+            path: path
         };
-        _params['v'] = _params['v'] || self.options.version || self.default.version;
-        _params['lang'] = _params['lang'] || self.options.language || self.default.language;
-
-        for(var key in _params) {
-            if( key === "message" ) {
-                options.path += ('&' + key + '=' + encodeURIComponent(_params[key]));
-            } else {
-                options.path += ('&' + key + '=' + _params[key]);
-            }
-        }
 
         https.get(options, function(res) {
             var apiResponse = new String();
@@ -251,7 +269,7 @@ var VK = function(_options) {
                 apiResponse += chunk;
             });
 
-            res.on('end',  function() {
+            res.on('end', function() {
                 var o = JSON.parse(apiResponse);
                 if (_responseType === 'callback' && typeof _response === 'function') {
                     _response(o);
@@ -275,32 +293,23 @@ var VK = function(_options) {
     self._sigRequest = function(_method, _params, _response, _responseType) {
 
         var params              = (!!_params ? _params : {});
-        params.api_id           = self.options.appID;
-        params.v                = ('v' in params) ? params['v'] : self.options.version ||  self.default.version;
-        params.lang             = ('lang' in params) ? params['lang'] :  self.options.language ||  self.default.language,
-        params.method           = _method;
+        params.api_id          = self.options.appID;
+        params.v                = ('v' in params) ? params['v'] : self.options.version || self.default.version;
+        params.lang            = ('lang' in params) ? params['lang'] :  self.options.language ||  self.default.language,
+        params.method          = _method;
         params.timestamp        = new Date().getTime();
-        params.format           = 'json';
-        params.random           = Math.floor(Math.random() * 9999);
+        params.format          = 'json';
+        params.random          = Math.floor(Math.random() * 9999);
 
         params  = this._sortObjectByKey(params);
         var sig = '';
         for(var key in params) {
             sig = sig + key + '=' + params[key];
         }
-        sig             = sig + self.options.appSecret;
+        sig            = sig + self.options.appSecret;
         params.sig      = crypto.createHash('md5').update(sig, 'utf8').digest('hex');
 
-
-        var requestArray = new Array();
-        for(var key in params) {
-            if( key === "message" )  {
-                requestArray.push(key + '=' + encodeURIComponent(params[key]) );
-            } else {
-                requestArray.push(key + '=' + (params[key]) );
-            }
-        }
-        var requestString = this._implode('&', requestArray);
+        var requestString = self._buildQuery(params);
 
         var options = {
             host: 'api.vk.com',
@@ -315,7 +324,7 @@ var VK = function(_options) {
                 apiResponse += chunk;
             });
 
-            res.on('end',  function() {
+            res.on('end', function() {
                 var o = JSON.parse(apiResponse);
                 if (_responseType === 'callback' && typeof _response === 'function') {
                     _response(o);
@@ -334,7 +343,7 @@ var VK = function(_options) {
      * @param {array} pieces
      * @returns {@exp;pieces@call;join|@exp;@exp;pieces@call;joinpieces|VK.implode.pieces}
      */
-    self._implode  = function implode( glue, pieces ) {
+    self._implode = function implode( glue, pieces ) {
         return ( ( pieces instanceof Array ) ? pieces.join ( glue ) : pieces );
     };
 
@@ -360,6 +369,24 @@ var VK = function(_options) {
         }
         return sorted;
     };
+
+    /**
+     * Generate URL-encoded query string
+     * @param  {object} params
+     * @return {string}
+     */
+    self._buildQuery = function(params) {
+        var arr = [];
+        for(var name in params) {
+            var value = params[name];
+
+            if("undefined" !== typeof value) {
+              arr.push( name+'='+ encodeURIComponent(value) );
+            }
+        }
+
+        return self._implode('&', arr);
+    }
 
 };
 
