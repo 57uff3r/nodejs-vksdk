@@ -122,7 +122,6 @@ var VK = function(_options) {
         var path = '/access_token?' + self._buildQuery({
                 "client_id": self.options.appID,
                 "client_secret": self.options.appSecret,
-                "code": _code,
                 'redirect_uri': "undefined" === typeof self.options.redirectUri ? undefined : self.options.redirectUri,
                 'grant_type': 'password',
                 'scope': 'notify,friends,photos,audio,video,docs,messages,notifications,offline,wall',
