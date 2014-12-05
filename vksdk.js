@@ -149,6 +149,8 @@ var VK = function(_options) {
                     self.emit('acquireTokenReady');
                 }
             });
+        }).on('error', function (e) {
+            self.emit('error', e);
         });
     };
 
@@ -192,6 +194,8 @@ var VK = function(_options) {
                 }
             });
 
+        }).on('error', function (e) {
+            self.emit('error', e);
         });
     };
 
@@ -230,6 +234,8 @@ var VK = function(_options) {
                 }
             });
 
+        }).on('error', function (e) {
+            self.emit('error', e);
         });
     };
 
@@ -278,6 +284,8 @@ var VK = function(_options) {
                 }
             });
 
+        }).on('error', function (e) {
+            self.emit('error', e);
         });
     };
 
@@ -332,6 +340,8 @@ var VK = function(_options) {
                     else self.emit(_response, o);
                 }
             });
+        }).on('error', function (e) {
+            self.emit('error', e);
         });
 
     };
