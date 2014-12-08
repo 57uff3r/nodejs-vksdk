@@ -6,11 +6,11 @@
  * @see https://github.com/57uff3r/nodejs-vksdk
  * @see http://57uff3r.ru
  */
-var    util           = require('util');
+var     util            = require('util');
         EventEmitter    = require('events').EventEmitter,
         crypto          = require('crypto'),
         http            = require('http'),
-        https          = require('https');
+        https           = require('https');
 
 /**
  * Create new SDK object
@@ -21,6 +21,11 @@ var    util           = require('util');
  */
 var VK = function(_options) {
     var self = this;
+
+    // set defaul values
+    self.token          = null;
+    self.expiresIn      = null;
+    self.userId         = null;
 
     // appID, appSecret, mode (sig, oauth), [version], [language]
     self.options        = _options;
@@ -150,7 +155,7 @@ var VK = function(_options) {
                 }
             });
         }).on('error', function (e) {
-            self.emit('error', e);
+            self.emit('http-error', e);
         });
     };
 
@@ -195,7 +200,7 @@ var VK = function(_options) {
             });
 
         }).on('error', function (e) {
-            self.emit('error', e);
+            self.emit('http-error', e);
         });
     };
 
@@ -235,7 +240,7 @@ var VK = function(_options) {
             });
 
         }).on('error', function (e) {
-            self.emit('error', e);
+            self.emit('http-error', e);
         });
     };
 
@@ -285,7 +290,7 @@ var VK = function(_options) {
             });
 
         }).on('error', function (e) {
-            self.emit('error', e);
+            self.emit('http-error', e);
         });
     };
 
@@ -341,7 +346,7 @@ var VK = function(_options) {
                 }
             });
         }).on('error', function (e) {
-            self.emit('error', e);
+            self.emit('http-error', e);
         });
 
     };

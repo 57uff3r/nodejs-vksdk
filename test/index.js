@@ -81,7 +81,6 @@ describe('api', function() {
 
         vk.acquireToken('57uff3r@gmail.com', 'test');
         vk.on('acquireTokenNotReady', function(_o) {
-          console.log(_o);
           // assert.equal(_o.error, 'invalid_request');
           done();
         });
@@ -102,6 +101,14 @@ describe('api', function() {
             assert.equal(_o.error.error_code, 500);
           });
         });
+      });
+    });
+
+    it('Method works: should run methods', function() {
+      assert.doesNotThrow(function() {
+        assert.isNotNull(vk.getToken());
+        assert.isNull(vk.getUserId());
+        assert.isNull(vk.getExpiresIn());
       });
     });
 
