@@ -194,6 +194,12 @@ HTTP errors
 -------
 SDK emits 'http-error' event in case of http errors.
 
+```js
+vk.on('http-error', function(_e) {
+    console.log(_o);
+});
+
+```
 
 Methods
 -------
