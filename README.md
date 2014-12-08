@@ -127,6 +127,10 @@ vk.on('acquireTokenNotReady', function(_error) {
 });
 ```
 
+When you use token auth you also can call a few getters:
+* vk.getToken() — will return current token
+* vk.getUserId() — will return current user id
+* vk.getExpiresIn() — will return current token expiration time
 
 Requests
 -------
@@ -184,6 +188,12 @@ You can't change the names of this events.
 * appServerTokenNotReady
 * acquireTokenReady
 * acquireTokenNotReady
+
+
+HTTP errors
+-------
+SDK emits 'http-error' event in case of http errors.
+
 
 Methods
 -------

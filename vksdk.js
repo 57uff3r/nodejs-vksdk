@@ -235,6 +235,9 @@ var VK = function(_options) {
 
                 } else {
                     self.token = o.access_token;
+                    self.userId = o.user_id;
+                    self.expiresIn = o.expires_in;
+
                     self.emit('appServerTokenReady');
                 }
             });
