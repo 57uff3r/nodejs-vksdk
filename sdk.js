@@ -22,6 +22,12 @@ var     util            = require('util');
 var VK = function(_options) {
     var self = this;
 
+    // setup options
+    if (typeof(_options) != 'object' || _options.length == 0) {
+        throw 'nodejs-vk-sdk: you have to specify options in sdk constructor';
+    }
+
+
     // By default we use latest API version
     self.version = '5.27';
 
@@ -62,6 +68,37 @@ var VK = function(_options) {
      */
     self.setToken = function(_t) {
         self.token = _t;
+        return true;
+    }
+
+
+
+    /**
+     * Extra stuff
+     */
+    // Speed up calls to hasOwnProperty
+    self.hasOwnProperty = Object.prototype.hasOwnProperty;
+
+    /**
+     * Test — if variable empty
+     * @param {mixed}
+     * @return {bool}
+     */
+    self.isEmpty = function(_obj) {
+        // null and undefined are "empty"
+        if (_obj == null) return true;
+
+        // Assume if it has a length property with a non-zero value
+        // that that property is correct.
+        if (_obj.length > 0)    return false;
+        if (_obj.length === 0)  return true;
+
+        // Otherwise, does it have any properties of its own?
+        // Note that this doesn't handle
+        // toString and valueOf enumeration bugs in IE < 9
+        for (var key in _obj) {
+            if (self.hasOwnProperty.call(_obj, key)) return false;
+        }
         return true;
     }
 

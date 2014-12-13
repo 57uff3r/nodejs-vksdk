@@ -17,47 +17,79 @@ describe('basicSdk', function() {
 
   this.timeout(20000);
 
-    it('Should return default version', function(done) {
+  it('Should return default version', function(done) {
 
-      assert.doesNotThrow(function() {
-          assert.equal(vk.getVersion(), '5.27');
-          done();
-      });
-
+    assert.doesNotThrow(function() {
+        assert.equal(vk.getVersion(), '5.27');
+        done();
     });
 
+  });
 
-    it('Should set new version', function(done) {
 
-      assert.doesNotThrow(function() {
-          assert.isTrue(vk.setVersion('5.25'));
-          assert.equal(vk.getVersion(), '5.25');
-          done();
-      });
+  it('Should set new version', function(done) {
 
+    assert.doesNotThrow(function() {
+        assert.isTrue(vk.setVersion('5.25'));
+        assert.equal(vk.getVersion(), '5.25');
+        done();
     });
 
-    it('Should not return token', function(done) {
+  });
 
-      assert.doesNotThrow(function() {
-          assert.isFalse(vk.getToken());
-          done();
-      });
+  it('Should not return token', function(done) {
 
+    assert.doesNotThrow(function() {
+        assert.isFalse(vk.getToken());
+        done();
     });
 
+  });
 
-    it('Should set new token', function(done) {
 
-      assert.doesNotThrow(function() {
-          assert.isTrue(vk.setToken('abcd'));
-          assert.equal(vk.getToken(), 'abcd');
-          done();
-      });
+  it('Should set new token', function(done) {
 
+    assert.doesNotThrow(function() {
+        assert.isTrue(vk.setToken('abcd'));
+        assert.equal(vk.getToken(), 'abcd');
+        done();
     });
 
+  });
 
+});
+
+
+describe('systemStuff', function() {
+  var vk = new VK({
+     'appID'     : 2807970,
+     'appSecret' : 'L14ZKpgQPalJdumI6vFK',
+     'mode'      : 'sig'
+  });
+
+
+
+  this.timeout(20000);
+
+  it('Should correctly identify non-empty objects', function(done) {
+    assert.doesNotThrow(function() {
+      assert.isFalse(vk.isEmpty("Hello"));
+      assert.isFalse(vk.isEmpty([1,2,3]));
+      assert.isFalse(vk.isEmpty({test: 1}));
+      assert.isFalse(vk.isEmpty({length: 3, custom_property: [1,2,3]}));
+      done();
+    });
+  });
+
+  it('Should correctly identify empty objects', function(done) {
+    assert.doesNotThrow(function() {
+      assert.isTrue(vk.isEmpty(""));
+      assert.isTrue(vk.isEmpty({}));
+      assert.isTrue(vk.isEmpty([]));
+      assert.isTrue(vk.isEmpty({length: 0, custom_property: []}));
+      done();
+    });
+  });
 });
 
 // describe('api', function() {
