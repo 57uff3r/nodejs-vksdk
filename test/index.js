@@ -10,51 +10,42 @@ var done = function(_o) {
 
 describe('basicSdk', function() {
   var vk = new VK({
-     'appID'     : 2807970,
-     'appSecret' : 'L14ZKpgQPalJdumI6vFK',
-     'mode'      : 'sig'
+     'appId'     : 2807970,
+     'appSecret' : 'L14ZKpgQPalJdumI6vFK'
   });
 
   this.timeout(20000);
 
-  it('Should return default version', function(done) {
+  it('Should test getters and setters', function(done) {
 
     assert.doesNotThrow(function() {
         assert.equal(vk.getVersion(), '5.27');
-        done();
     });
-
-  });
-
-
-  it('Should set new version', function(done) {
 
     assert.doesNotThrow(function() {
         assert.isTrue(vk.setVersion('5.25'));
         assert.equal(vk.getVersion(), '5.25');
-        done();
     });
-
-  });
-
-  it('Should not return token', function(done) {
 
     assert.doesNotThrow(function() {
         assert.isFalse(vk.getToken());
-        done();
     });
-
-  });
-
-
-  it('Should set new token', function(done) {
 
     assert.doesNotThrow(function() {
         assert.isTrue(vk.setToken('abcd'));
         assert.equal(vk.getToken(), 'abcd');
-        done();
     });
 
+    assert.doesNotThrow(function() {
+        assert.isFalse(vk.getHttpsUsage());
+        assert.isTrue(vk.enableHttps());
+        assert.isTrue(vk.getHttpsUsage());
+        assert.isTrue(vk.disableHttps());
+        assert.isFalse(vk.getHttpsUsage());
+
+    });
+
+    done();
   });
 
 });
@@ -62,12 +53,9 @@ describe('basicSdk', function() {
 
 describe('systemStuff', function() {
   var vk = new VK({
-     'appID'     : 2807970,
-     'appSecret' : 'L14ZKpgQPalJdumI6vFK',
-     'mode'      : 'sig'
+     'appId'     : 2807970,
+     'appSecret' : 'L14ZKpgQPalJdumI6vFK'
   });
-
-
 
   this.timeout(20000);
 
@@ -90,6 +78,17 @@ describe('systemStuff', function() {
       done();
     });
   });
+
+
+  it('Should correctly merge objects', function(done) {
+    assert.doesNotThrow(function() {
+      assert.deepEqual(vk.extend({}), {});
+      assert.deepEqual(vk.extend({}, {'t' : 1}), {'t' : 1});
+      assert.deepEqual(vk.extend({'a' : 1}, {'t' : 1}, {'t' : 2}), {'t' : 2, 'a' : 1});
+      done();
+    });
+  });
+
 });
 
 // describe('api', function() {
