@@ -1,6 +1,8 @@
 nodejs-vksdk
 ============
 
+Unstable code in 'refactoring' brunch, work in progress.
+
 Small SDK for vk.com API.
 
 Installation
