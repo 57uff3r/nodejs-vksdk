@@ -48,6 +48,31 @@ describe('basicSdk', function() {
     done();
   });
 
+
+  it('Should use oldRequest method', function(done) {
+    assert.doesNotThrow(function() {
+
+      vk.oldRequest('places.getCountryById', {'cids' : '1,2'});
+      vk.on('done:places.getCountryById', function(_o) {
+        assert.equal(_o.response[0].cid, 1);
+        assert.equal(_o.response[1].cid, 2);
+      });
+
+      vk.oldRequest('places.getCountryById', {'cids' : '1,2'}, 'customEvent');
+      vk.on('done:places.getCountryById', function(_o) {
+        assert.equal(_o.response[0].cid, 1);
+        assert.equal(_o.response[1].cid, 2);
+      });
+
+      vk.oldRequest('places.getCountryById', {'cids' : '1,2'}, function(_o) {
+        assert.equal(_o.response[0].cid, 1);
+        assert.equal(_o.response[1].cid, 2);
+      });
+
+      done();
+    });
+  });
+
 });
 
 

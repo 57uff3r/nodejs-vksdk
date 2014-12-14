@@ -145,6 +145,66 @@ VK.prototype.setToken = function(_t) {
 };
 
 
+/**
+ * =========================== Dealing with api
+ */
+VK.prototype.oldRequest = function(_method, _requestParams, _response) {
+    var responseType = 'event';
+
+    if ( typeof(_response) === 'function') {
+        responseType = 'callback';
+    }
+
+    var params             = (!!_requestParams ? _requestParams : {});
+    params.api_id          = this.options.appID;
+    params.v               = ('v' in params) ? params['v'] : this.options.version || this.default.version;
+    params.lang            = ('lang' in params) ? params['lang'] :  this.options.language ||  this.default.language;
+    params.method          = _method;
+    params.timestamp        = new Date().getTime();
+    params.format          = 'json';
+    params.random          = Math.floor(Math.random() * 9999);
+
+    params  = this.sortObjectByKey(params);
+    var sig = '';
+    for(var key in params) {
+        sig = sig + key + '=' + params[key];
+    }
+    sig            = sig + this.options.appSecret;
+    params.sig     = crypto.createHash('md5').update(sig, 'utf8').digest('hex');
+
+    var requestString = this.buildQuery(params);
+
+    var options = {
+        host: 'api.vk.com',
+        port: 80,
+        path: '/api.php?' + requestString
+    };
+
+    var self = this;
+
+    http.get(options, function(res) {
+        var apiResponse = new String();
+        res.setEncoding('utf8');
+
+        res.on('data', function(chunk) {
+            apiResponse += chunk;
+        });
+
+        res.on('end', function() {
+            var o = JSON.parse(apiResponse);
+            if (_responseType === 'callback' && typeof _response === 'function') {
+                _response(o);
+            } else {
+                if (!_response) self.emit('done:' + _method, o);
+                else self.emit(_response, o);
+            }
+        });
+    }).on('error', function (e) {
+        self.emit('http-error', e);
+    });
+};
+
+
 
 /**
  * =========================== Extra stuff
@@ -188,5 +248,57 @@ VK.prototype.extend = function(target) {
         }
     });
     return target;
+};
+
+/**
+ * Implode array to string
+ * @param {string} glue
+ * @param {array} pieces
+ * @returns {@exp;pieces@call;join|@exp;@exp;pieces@call;joinpieces|VK.implode.pieces}
+ */
+VK.prototype.implode = function implode( glue, pieces ) {
+    return ( ( pieces instanceof Array ) ? pieces.join ( glue ) : pieces );
+};
+
+/**
+ * Sort object properties by name
+ * @param {object} o
+ * @returns {object}
+ */
+VK.prototype.sortObjectByKey = function (o) {
+    var sorted = {},
+    key, a = [];
+
+    for (key in o) {
+        if (o.hasOwnProperty(key)) {
+            a.push(key);
+        }
+    }
+
+    a.sort();
+
+    for (var key = 0; key < a.length; key++) {
+        sorted[a[key]] = o[a[key]];
+    }
+    return sorted;
+};
+
+
+/**
+ * Generate URL-encoded query string
+ * @param  {object} params
+ * @return {string}
+ */
+VK.prototype.buildQuery = function(params) {
+    var arr = [];
+    for(var name in params) {
+        var value = params[name];
+
+        if("undefined" !== typeof value) {
+          arr.push( name+'='+ encodeURIComponent(value) );
+        }
+    }
+
+    return this.implode('&', arr);
 };
 
