@@ -42,7 +42,6 @@ describe('basicSdk', function() {
         assert.isTrue(vk.getHttpsUsage());
         assert.isTrue(vk.disableHttps());
         assert.isFalse(vk.getHttpsUsage());
-
     });
 
     done();
@@ -51,25 +50,69 @@ describe('basicSdk', function() {
 
   it('Should use oldRequest method', function(done) {
     assert.doesNotThrow(function() {
-
       vk.oldRequest('places.getCountryById', {'cids' : '1,2'});
       vk.on('done:places.getCountryById', function(_o) {
         assert.equal(_o.response[0].cid, 1);
         assert.equal(_o.response[1].cid, 2);
+        done();
       });
+    });
+  });
 
+  it('Should use oldRequest method with custom event', function(done) {
+    assert.doesNotThrow(function() {
       vk.oldRequest('places.getCountryById', {'cids' : '1,2'}, 'customEvent');
-      vk.on('done:places.getCountryById', function(_o) {
+      vk.on('customEvent', function(_o) {
         assert.equal(_o.response[0].cid, 1);
         assert.equal(_o.response[1].cid, 2);
       });
+      done();
+    });
+  });
 
+  it('Should use oldRequest method with callback', function(done) {
+    assert.doesNotThrow(function() {
       vk.oldRequest('places.getCountryById', {'cids' : '1,2'}, function(_o) {
         assert.equal(_o.response[0].cid, 1);
         assert.equal(_o.response[1].cid, 2);
+        done();
       });
+    });
+  });
 
-      done();
+
+  it('Should get server access token', function(done) {
+    assert.doesNotThrow(function() {
+      vk.requestServerToken(function(_o) {
+        assert.isTrue('access_token' in _o);
+        assert.isTrue('expires_in' in _o);
+        assert.isTrue(_o.expires_in === 0);
+        done();
+      });
+    });
+  });
+
+  it('Should get server access token with callback', function(done) {
+    assert.doesNotThrow(function() {
+      vk.requestServerToken();
+      vk.on('serverTokenReady', function(_o) {
+        assert.isTrue('access_token' in _o);
+        assert.isTrue('expires_in' in _o);
+        assert.isTrue(_o.expires_in === 0);
+        done();
+      });
+    });
+  });
+
+  it('Should get server access token with custom event', function(done) {
+    assert.doesNotThrow(function() {
+      vk.requestServerToken('myCustomEvent');
+      vk.on('myCustomEvent', function(_o) {
+        assert.isTrue('access_token' in _o);
+        assert.isTrue('expires_in' in _o);
+        assert.isTrue(_o.expires_in === 0);
+        done();
+      });
     });
   });
 
