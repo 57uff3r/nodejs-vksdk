@@ -215,6 +215,65 @@ VK.prototype.oldRequest = function(_method, _requestParams, _response) {
     });
 };
 
+/**
+ * Request API method
+ * @param {string} _method
+ * @param {mixed} _params
+ * @param {mixed} _response
+ * @returns {mixed}
+ *
+ * @see https://vk.com/pages?oid=-17680044&p=Application_Interaction_with_API
+ */
+VK.prototype.request = function(_method, _requestParams, _response) {
+    var responseType = 'event';
+
+    if ( typeof(_response) === 'function') {
+        responseType = 'callback';
+    }
+
+    var self = this;
+
+    var params = {
+        'lang'  : this.options.lang,
+        'v'     : this.options.version,
+        'https' : (this.options.https) ? 1 : 0
+    };
+
+    if (this.isEmpty(_requestParams) === false) {
+        for (var i in _requestParams) {
+            params[i] = _requestParams[i];
+        }
+    }
+
+    var options = {
+        host: 'api.vk.com',
+        port: 443,
+        path: '/method/' + _method + '?' + this.buildQuery(params)
+    };
+
+    https.get(options, function(res) {
+        var apiResponse = new String();
+        res.setEncoding('utf8');
+
+        res.on('data', function(chunk) {
+            apiResponse += chunk;
+        });
+
+        res.on('end', function() {
+            var o = JSON.parse(apiResponse);
+            if (responseType === 'callback' && typeof _response === 'function') {
+                _response(o);
+            } else {
+                if (responseType === 'event' && !!_response) {
+                    return self.emit(_response, o);
+                }
+                return self.emit('done:' + _method, o);
+            }
+        });
+    }).on('error', function (e) {
+        self.emit('http-error', e);
+    });
+};
 
 /**
  * Request server token
