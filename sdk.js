@@ -27,7 +27,8 @@ function VK(_options) {
         'appId'     : false,
         'https'     : false,
         'version'   : '5.27',
-        'language'  : 'ru'
+        'language'  : 'ru',
+        'secure'    : false
     };
 
     // no default token
@@ -126,13 +127,38 @@ VK.prototype.getHttpsUsage = function() {
 };
 
 /**
+ * Enable https
+ * @return {bool}
+ */
+VK.prototype.enableSecureRequests = function() {
+    this.options.secure = true;
+    return true;
+};
+
+/**
+ * Disable https
+ * @return {bool}
+ */
+VK.prototype.disableSecureRequests = function() {
+    this.options.secure = false;
+    return true;
+};
+
+/**
+ * Disable https
+ * @return {bool}
+ */
+VK.prototype.getSecureRequests = function() {
+    return this.options.secure;
+};
+
+/**
  * Get current access token
  * @return {string}
  */
 VK.prototype.getToken = function() {
     return this.token;
 };
-
 
 /**
  * Set current access token
@@ -245,10 +271,22 @@ VK.prototype.request = function(_method, _requestParams, _response) {
         }
     }
 
+    var requestString = this.buildQuery(params);
+
+    if (this.options.secure) {
+        if (this.token) {
+            requestString = requestString + '&access_token=' + this.token;
+        }
+
+        if (this.options.appSecret) {
+            requestString = requestString + '&client_secret=' + this.options.appSecret;
+        }
+    }
+
     var options = {
         host: 'api.vk.com',
         port: 443,
-        path: '/method/' + _method + '?' + this.buildQuery(params)
+        path: '/method/' + _method + '?' + requestString
     };
 
     https.get(options, function(res) {
