@@ -151,13 +151,27 @@ describe('basicSdk', function() {
     });
   });
 
-  it('Should request server method with server token', function(done) {
+  it('Should request server method with server token and event', function(done) {
     assert.doesNotThrow(function() {
       vk.requestServerToken(function(_o) {
         vk.setToken(_o.access_token);
         vk.setVersion('5.27');
         vk.request('secure.getAppBalance');
         vk.on('done:secure.getAppBalance', function(_o) {
+          assert.equal(_o.error.error_code,  500);
+          done();
+        });
+      });
+    });
+  });
+
+  it('Should request server method with server token and custom event', function(done) {
+    assert.doesNotThrow(function() {
+      vk.requestServerToken(function(_o) {
+        vk.setToken(_o.access_token);
+        vk.setVersion('5.27');
+        vk.request('secure.getAppBalance', {}, 'done');
+        vk.on('done', function(_o) {
           assert.equal(_o.error.error_code,  500);
           done();
         });
