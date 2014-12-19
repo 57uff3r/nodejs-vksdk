@@ -104,8 +104,8 @@ VK.prototype.setLanguage = function(_l) {
  * Enable https
  * @return {bool}
  */
-VK.prototype.enableHttps = function() {
-    this.options.https = true;
+VK.prototype.setHttps = function(_v) {
+    this.options.https = _v;
     return true;
 };
 
@@ -113,16 +113,7 @@ VK.prototype.enableHttps = function() {
  * Disable https
  * @return {bool}
  */
-VK.prototype.disableHttps = function() {
-    this.options.https = false;
-    return true;
-};
-
-/**
- * Disable https
- * @return {bool}
- */
-VK.prototype.getHttpsUsage = function() {
+VK.prototype.getHttps = function() {
     return this.options.https;
 };
 
@@ -130,17 +121,8 @@ VK.prototype.getHttpsUsage = function() {
  * Enable https
  * @return {bool}
  */
-VK.prototype.enableSecureRequests = function() {
-    this.options.secure = true;
-    return true;
-};
-
-/**
- * Disable https
- * @return {bool}
- */
-VK.prototype.disableSecureRequests = function() {
-    this.options.secure = false;
+VK.prototype.setSecureRequests = function(_v) {
+    this.options.secure = _v;
     return true;
 };
 

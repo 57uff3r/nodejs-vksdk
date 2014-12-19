@@ -37,11 +37,9 @@ describe('basicSdk', function() {
     });
 
     assert.doesNotThrow(function() {
-        assert.isFalse(vk.getHttpsUsage());
-        assert.isTrue(vk.enableHttps());
-        assert.isTrue(vk.getHttpsUsage());
-        assert.isTrue(vk.disableHttps());
-        assert.isFalse(vk.getHttpsUsage());
+        assert.isFalse(vk.getHttps());
+        assert.isTrue(vk.setHttps(true));
+        assert.isTrue(vk.getHttps());
     });
 
     done();
@@ -118,8 +116,9 @@ describe('basicSdk', function() {
 
   it('Should get Durov\'s profile with callback in insecure mode', function(done) {
     assert.doesNotThrow(function() {
-      vk.disableSecureRequests();
+      vk.setSecureRequests(false);
       vk.request('users.get', {'user_id' : 1}, function(_o) {
+        //console.log(_o);
         assert.equal(_o.response[0].id,  1);
         assert.equal(_o.response[0].first_name,  'Pavel');
         assert.equal(_o.response[0].last_name,  'Durov');
@@ -130,7 +129,7 @@ describe('basicSdk', function() {
 
   it('Should get error on server request', function(done) {
     assert.doesNotThrow(function() {
-      vk.enableSecureRequests();
+      vk.setSecureRequests(true);
       vk.request('secure.getAppBalance', {}, function(_o) {
         assert.equal(_o.error.error_code,  10);
         done();

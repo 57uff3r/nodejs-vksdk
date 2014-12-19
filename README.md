@@ -5,195 +5,100 @@ Unstable code in 'refactoring' brunch, work in progress.
 
 Small SDK for vk.com API.
 
-Installation
--------
+# Installation
 
     npm install vksdk
 
-Usage
--------
+# Usage
 ```js
 var VK = require('vksdk');
 ```
 
-You can use two ways of performing API requests:
-
-* [sig (with signature and http)](http://vk.com/pages?oid=-17680044&p=Application_Interaction_with_API)
-* token (oauth or direct token request)
-
-This SDK provides both ways:
-
+Setup:
 ```js
 var vk = new VK({
-    'appID'     : 2807970,
-    'appSecret' : 'L1ZKpgQPalJdumI6vFK',
-    'mode'      : 'oauth'
+    'appID'     : [Your application ID here],
+    'appSecret' : [Your application secret code here],
 });
 ```
 
+Required config options:
+* appSecret — application secret code (check your application settings on vk.com)
+* appID — vk.com application id
+
+Available config options:
+
+* **[bool] https** — with this options all links in API answers will be with https protocol. Disabled by default.
+* **[string] version** — vk.com api verions. Default: 5.27
+* **[string] language** — Language code for api answers
+* **[bool] secure** — enable api requests with tokens. Othervise appID and appSecret will be used. Default false.
+
+
+You can  read and change config options after initialization:
+* **getVersion()** — get current API version
+* **setVersion(_v)** — set current API version
+* **getLanguage()** — get current API language
+* **setLanguage(_v)** — set current API language
+* **getHttps()** — get https links usage for API answers
+* **setHttps(_v)** — set https links usage for API answers
+* **getSecureRequests()** — get token's usage for API requests
+* **setSecureRequests(_v)** — set token's usage for API requests
+
+
+
+# API requests
+For vk.com API requests you have to use method *request(_method, _requestParams, _response)*.
+
+* **[string] _method** — name of vk.com API method,
+* **[moxed] _requestParams** - object with values of params for api method. E.g ids, filters etc. This param is not required. You also can pass empty object {}
+* **[mixed] _response** — special response handler (if needed): function or event name.
+
+
+
+Request method gets data from API and returns result. There are 3 ways to get data from API
+
+
+## Callback
+
 ```js
-var vk = new VK({
-    'appID'     : 2807970,
-    'appSecret' : 'L1ZKpgQPalJdumI6vFK',
-    'mode'      : 'sig'
+vk.setSecureRequests(false);
+vk.request('users.get', {'user_id' : 1}, function(_o) {
+console.log(_o);
 });
 ```
 
-You also can change request mode 'on-fly':
+## Event
+
+After success API call SDK emits the event named 'done:' + _method;
+So if you call method *users.get*, you have to wait event *done:users.get*
 
 ```js
-vk.changeMode('oauth');
-```
-or
-
-```js
-vk.changeMode('sig');
-```
-
-### How to setup version of API and language
-
-By default used API version 3.0 and Russian language.
-
-You may setup [latest version](https://vk.com/dev/versions) of vk.com API and change language.
-
-```js
-var vk = new VK({
-    'appID'     : 2807970,
-    'appSecret' : 'L1ZKpgQPalJdumI6vFK',
-    'mode'      : 'oauth',
-    'version'   : '5.26',
-    'language'  : 'en'
-});
-
-```
-
-
-Signature auth
--------
-You need just your appID and appSecret.
-
-
-Token auth
--------
-You need token to perform api requests.
-
-SDK can automaticly provide tokens for server-side applications. With server-side token you
-can perform only limited set of api methods like secure.getAppBalance or secure.sendNotification.
-
-SDK has two events for server-side token requests:
-* appServerTokenReady - token is ready
-* appServerTokenNotReady — something was wrong
-
-```js
-vk.setToken();
-vk.on('appServerTokenReady', function() {
-    vk.request('secure.getAppBalance');
-    // etc
-});
-vk.on('appServerTokenNotReady', function(_error) {
-    // error handler
-});
-```
-
-Second way — get token for client API requests with [special code from your fron-end](http://vk.com/developers.php?oid=-1&p=%D0%90%D0%B2%D1%82%D0%BE%D1%80%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F_%D1%81%D0%B0%D0%B9%D1%82%D0%BE%D0%B2).
-
-```js
-vk.setToken({ code : '0819c207b9933a' });
-vk.on('tokenByCodeReady', function() {
-    vk.request('getProfiles', {'uids' : '29894'});
-    // etc...
-});
-vk.on('tokenByCodeNotReady', function(_error) {
-    // error handler
-});
-```
-
-Third way — get token directly from your application in customers browser.
-```js
-vk.setToken( { token :'f1eebc4311e775b128183993ee16302ac036a67af30424238d1oo14d35dfa61896f172ee630b7034a' });
-vk.request('getProfiles', {'uids' : '29894'});
-vk.on('done:getProfiles', function(_o) {
+vk.setSecureRequests(false);
+vk.request('users.get', {'user_id' : 1});
+vk.on('done:users.get', function(_o) {
     console.log(_o);
 });
 ```
 
-Fourth way -  get token using customers vk.com login and password.
-```js
-vk.acquireToken('vk_com_login@mail.com', 'password');
-vk.on('appServerTokenReady', function() {
-    vk.request('acquireTokenReady');
-    // etc
-});
-vk.on('acquireTokenNotReady', function(_error) {
-    // error handler
-});
-```
 
-When you use token auth you also can call a few getters:
-* vk.getToken() — will return current token
-* vk.getUserId() — will return current user id
-* vk.getExpiresIn() — will return current token expiration time
+## Custom event
 
-Requests
--------
+Result of request will be returned with your custom event
 
 ```js
-vk.request('getProfiles', {'uids' : '29894'});
-vk.on('done:getProfiles', function(_o) {
+vk.setSecureRequests(false);
+vk.request('users.get', {'user_id' : 1}, 'myCustomEvent');
+vk.on('myCustomEvent', function(_o) {
     console.log(_o);
 });
 ```
 
-There are two ways to get response: event and callback function.
-
-Event
--------
-When request result will be ready, SDK will fire event with request result.
-Event name will be like  done:methodName. So if you request getProfiles() SDK will fire
-done:getProfiles event();
-
-But you can set your custom event name:
-
-```js
-vk.request('getProfiles', {'uids' : '29894'}, 'myEvent1');
-vk.on('myEvent1', function(_o) {
-    console.log(_o);
-});
-
-vk.request('getProfiles', {'uids' : '1'}, 'myEvent2');
-vk.on('myEvent2', function(_o) {
-    console.log(_o);
-});
-```
-
-Callback
--------
-When request result will be ready, SDK will call callback function with request result.
-For this, you need to specify callback with 3rd parameter of request.
-
-Example:
-
-```js
-vk.request('getProfiles', {'uids' : '29894'}, function(_o) {
-    console.log(_o);
-});
-
-```
-
-System events in SDK
--------
-You can't change the names of this events.
-
-* tokenByCodeReady
-* tokenByCodeNotReady
-* appServerTokenReady
-* appServerTokenNotReady
-* acquireTokenReady
-* acquireTokenNotReady
 
 
-HTTP errors
--------
+
+
+
+# HTTP errors
 SDK emits 'http-error' event in case of http errors.
 
 ```js
@@ -203,18 +108,10 @@ vk.on('http-error', function(_e) {
 
 ```
 
-Methods
--------
-* acquireToken(login, password) - request token by login and password
-* setToken([params]) — request token using code from client-side
-* changeMode(string) — set up request mode (oauth or sig)
-* getToken() — get current token
-* request(methodName, methodParams, [response], responseType) — request API method
-
 SDK provides all methods from [events.EventEmitter](http://nodejs.org/api/events.html)
 
-Support
--------
+# Support
+
 * 57uff3r@gmail.com
 * skype: andrey.korchak
 * http://57uff3r.ru
