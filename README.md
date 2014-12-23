@@ -45,7 +45,7 @@ vk.request('users.get', {'user_id' : 1}, function(_o) {
 });
 ```
 
-# Setuo
+# Setup
 ```js
 var VK = require('vksdk');
 
