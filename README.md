@@ -1,21 +1,54 @@
 nodejs-vksdk
 ============
-
-Unstable code in 'refactoring' brunch, work in progress.
-
 Small SDK for vk.com API.
 
 # Installation
-
     npm install vksdk
 
-# Usage
+# Example
 ```js
+// Setup
 var VK = require('vksdk');
+var vk = new VK({
+   'appId'     : 2807970,
+   'appSecret' : 'L14ZKpgQPalJdumI6vFK',
+   'language'  : 'ru'
+});
+
+/**
+ * Request server methods
+ */
+
+// Setup server access token for server API methods
+vk.on('serverTokenReady', function(_o) {
+    // Here will be server access token
+    vk.setToken(_o.access_token);
+});
+
+// Turn on requests with access tokens
+vk.setSecureRequests(true);
+
+// Request server API method
+vk.request('secure.getSMSHistory', {}, function(_dd) {
+    console.log(_dd);
+});
+
+/**
+ * Request client methods
+ */
+// First you have to pass access_token from client side SJ code
+vk.setToken(access_token);
+
+// Request 'users.get' method
+vk.request('users.get', {'user_id' : 1}, function(_o) {
+    console.log(_o);
+});
 ```
 
-Setup:
+# Setuo
 ```js
+var VK = require('vksdk');
+
 var vk = new VK({
     'appID'     : [Your application ID here],
     'appSecret' : [Your application secret code here],
@@ -31,10 +64,10 @@ Available config options:
 * **[bool] https** — with this options all links in API answers will be with https protocol. Disabled by default.
 * **[string] version** — vk.com api verions. Default: 5.27
 * **[string] language** — Language code for api answers
-* **[bool] secure** — enable api requests with tokens. Othervise appID and appSecret will be used. Default false.
+* **[bool] secure** — enable api requests with tokens. Default false.
 
 
-You can  read and change config options after initialization:
+You can  read and change some config options:
 * **getVersion()** — get current API version
 * **setVersion(_v)** — set current API version
 * **getLanguage()** — get current API language
@@ -45,21 +78,16 @@ You can  read and change config options after initialization:
 * **setSecureRequests(_v)** — set token's usage for API requests
 
 
-
 # API requests
 For vk.com API requests you have to use method *request(_method, _requestParams, _response)*.
 
 * **[string] _method** — name of vk.com API method,
-* **[moxed] _requestParams** - object with values of params for api method. E.g ids, filters etc. This param is not required. You also can pass empty object {}
-* **[mixed] _response** — special response handler (if needed): function or event name.
-
-
+* **[mixed] _requestParams** - object with values of params for api method. This param is not required. You also can pass empty object *{}*
+* **[mixed] _response** — special response handler (not required), function or event name.
 
 Request method gets data from API and returns result. There are 3 ways to get data from API
 
-
 ## Callback
-
 ```js
 vk.setSecureRequests(false);
 vk.request('users.get', {'user_id' : 1}, function(_o) {
@@ -68,7 +96,6 @@ console.log(_o);
 ```
 
 ## Event
-
 After success API call SDK emits the event named 'done:' + _method;
 So if you call method *users.get*, you have to wait event *done:users.get*
 
@@ -80,9 +107,7 @@ vk.on('done:users.get', function(_o) {
 });
 ```
 
-
 ## Custom event
-
 Result of request will be returned with your custom event
 
 ```js
@@ -93,29 +118,55 @@ vk.on('myCustomEvent', function(_o) {
 });
 ```
 
+# Server access token
+For some api methods you need server access token
 
+```js
+vk.requestServerToken();
 
+// Waiting for special 'serverTokenReady' event
+vk.on('serverTokenReady', function(_o) {
+    // Here will be server access token
+    console.log(_o);
+});
+```
 
-
+You also can get tokeb with callback or custom event
 
 # HTTP errors
 SDK emits 'http-error' event in case of http errors.
 
 ```js
 vk.on('http-error', function(_e) {
-    console.log(_o);
+    console.log(_e);
 });
-
 ```
 
 SDK provides all methods from [events.EventEmitter](http://nodejs.org/api/events.html)
 
-# Support
+# Bonus
+You also can request some api methods without any tokens, with [app signature](https://vk.com/pages?oid=-17680044&p=Application_Interaction_with_API)
 
+```js
+vk.oldRequest('places.getCountryById', {'cids' : '1,2'}, function(_o) {
+    console.log(_o);
+});
+```
+
+But this way is deprecated and doesn't work for all api methods.
+
+
+# For developers
+Your commits and pull requests are welcome. Please run the tests before
+
+    npm test
+
+You have to provide tests for the new features.
+
+# Support
 * 57uff3r@gmail.com
 * skype: andrey.korchak
 * http://57uff3r.ru
 * http://vk.com/s7uff3r
-
 
 See  also vk.com [cities and counties DB](http://citieslist.ru/)
