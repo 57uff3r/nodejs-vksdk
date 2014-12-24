@@ -6,7 +6,7 @@
  * @see https://github.com/57uff3r/nodejs-vksdk
  * @see http://57uff3r.ru
  */
-var     util            = require('util');
+var     util            = require('util'),
         EventEmitter    = require('events').EventEmitter,
         crypto          = require('crypto'),
         http            = require('http'),
