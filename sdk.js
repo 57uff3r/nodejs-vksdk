@@ -268,11 +268,16 @@ VK.prototype.request = function(_method, _requestParams, _response) {
     var options = {
         host: 'api.vk.com',
         port: 443,
-        path: '/method/' + _method + '?' + requestString
+        path: '/method/' + _method ,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': requestString.length
+        }
     };
 
-    https.get(options, function(res) {
-        var apiResponse = new String();
+    var post_req = https.request(options, function(res) {
+        var apiResponse = "";
         res.setEncoding('utf8');
 
         res.on('data', function(chunk) {
@@ -293,6 +298,9 @@ VK.prototype.request = function(_method, _requestParams, _response) {
     }).on('error', function (e) {
         self.emit('http-error', e);
     });
+
+    post_req.write(requestString);
+    post_req.end();
 };
 
 /**
