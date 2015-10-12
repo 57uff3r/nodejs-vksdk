@@ -11,7 +11,8 @@ var done = function(_o) {
 describe('basicSdk', function() {
   var vk = new VK({
      'appId'     : 2807970,
-     'appSecret' : 'L14ZKpgQPalJdumI6vFK'
+     'appSecret' : 'L14ZKpgQPalJdumI6vFK',
+     'language' : 'ru'
   });
 
   this.timeout(20000);
@@ -143,7 +144,7 @@ describe('basicSdk', function() {
         vk.setToken(_o.access_token);
         vk.setVersion('5.27');
         vk.request('secure.getSMSHistory', {}, function(_dd) {
-          assert.deepEqual(_dd.response, []);
+          assert.deepEqual(_dd,  { response: [] });
           done();
         });
       });
@@ -157,6 +158,7 @@ describe('basicSdk', function() {
         vk.setVersion('5.27');
         vk.request('secure.getAppBalance');
         vk.on('done:secure.getAppBalance', function(_o) {
+          console.log(_o);
           assert.equal(_o.error.error_code,  500);
           done();
         });

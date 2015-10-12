@@ -63,7 +63,7 @@ Available config options:
 
 * **[bool] https** — with this options all links in API answers will be with https protocol. Disabled by default.
 * **[string] version** — vk.com api verions. Default: 5.27
-* **[string] language** — Language code for api answers
+* **[string] language** — Language code for api answers (for old deprecated API)
 * **[bool] secure** — enable api requests with tokens. Default false.
 
 
