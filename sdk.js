@@ -306,19 +306,31 @@ VK.prototype.request = function(_method, _requestParams, _response) {
 /**
  * Request server token
  *
+ * @param {Function} _response - callback
+ * @param {String} [_code] - authorization code
+ * @param {String} [_redirect_uri] - URL where code has been received
+ *
  */
-VK.prototype.requestServerToken = function(_response) {
+VK.prototype.requestServerToken = function(_response, _code, _redirect_uri) {
     var responseType = 'event';
 
     if ( typeof(_response) === 'function') {
         responseType = 'callback';
     }
 
+    var path = '/access_token?client_id=' + this.options.appId +
+            '&client_secret=' + this.options.appSecret;
+
+    if (typeof _code !== 'undefined' && typeof _redirect_uri !== 'undefined') {
+        path += '&redirect_uri=' + _redirect_uri + '&code=' + _code;
+    } else {
+        path += '&v=' + this.options.version + '&grant_type=client_credentials';
+    }
+
     var options = {
         host: 'oauth.vk.com',
         port: 443,
-        path: '/access_token?client_id=' + this.options.appId + '&client_secret=' + this.options.appSecret +
-            '&v=' + this.options.version + '&grant_type=client_credentials'
+        path: path
     };
 
     var self  = this;
