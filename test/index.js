@@ -221,4 +221,28 @@ describe('systemStuff', function() {
     });
   });
 
+    it('Should create equal sig', function () {
+        var rightSid = 'expire=1271238742&mid=100172&secret=97c1e8933e&sid=549b550f608e4a4d247734941debb5e68df50a66c58dc6ee2a4f60a2&sig=372df9795fe8dd29684a2f996872457c',
+            rightSessionData = vk._parseSessionData(rightSid),
+            wrongSid;
+
+        assert.deepEqual(rightSessionData, {
+            expire: '1271238742',
+            mid: '100172',
+            secret: '97c1e8933e',
+            sid: '549b550f608e4a4d247734941debb5e68df50a66c58dc6ee2a4f60a2',
+            sig: '372df9795fe8dd29684a2f996872457c'
+        });
+        wrongSid = 'test=here&expire=1271238742&mid=100172&secret=97c1e8933e&sid=549b550f608e4a4d247734941debb5e68df50a66c58dc6ee2a4f60a2&sig=372df9795fe8dd29684a2f996872457c';
+        assert.isUndefined(vk._parseSessionData(wrongSid));
+        wrongSid = 'mid=100172&secret=97c1e8933e&sid=549b550f608e4a4d247734941debb5e68df50a66c58dc6ee2a4f60a2&sig=372df9795fe8dd29684a2f996872457c';
+        assert.isUndefined(vk._parseSessionData(wrongSid));
+
+        var testVk = new VK({ appId: 1, appSecret: '6FF1PUlZfEyutJxctvtd'});
+        assert.equal(testVk._createSig(rightSessionData), '372df9795fe8dd29684a2f996872457c');
+
+        // It will be ok, if disable check by data.expire
+        //assert.ok(testVk.isAuthOpenAPIMember(rightSid));
+    });
+
 });

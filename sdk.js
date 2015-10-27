@@ -181,13 +181,9 @@ VK.prototype.oldRequest = function(_method, _requestParams, _response) {
     params.format          = 'json';
     params.random          = Math.floor(Math.random() * 9999);
 
+    // JS doesn't guarantee the sequence of parameters in the object. It can break.
     params  = this.sortObjectByKey(params);
-    var sig = '';
-    for(var key in params) {
-        sig = sig + key + '=' + params[key];
-    }
-    sig            = sig + this.options.appSecret;
-    params.sig     = crypto.createHash('md5').update(sig, 'utf8').digest('hex');
+    params.sig             = this._createSig(params);
 
     var requestString = this.buildQuery(params);
 
@@ -457,3 +453,73 @@ VK.prototype.buildQuery = function(params) {
     return this.implode('&', arr);
 };
 
+/**
+ * Authorization on a Remote Side
+ * https://vk.com/dev/openapi_auth
+ *
+ * @param {String} sessionData
+ * @returns {Boolean}
+ */
+VK.prototype.isAuthOpenAPIMember = function(sessionData) {
+    var data = this._parseSessionData(sessionData);
+
+    if (data && data.sig === this._createSig(data) && data.expire > Math.floor(Date.now() / 1000)) {
+        return true;
+    }
+    return false;
+};
+
+/**
+ * Create signature from parameters
+ *
+ * @param {Object} params
+ * @returns {String}
+ * @private
+ */
+VK.prototype._createSig = function(params) {
+    var sig = '';
+    for(var key in params) {
+        if (key !== 'sig') {
+            sig += key + '=' + params[key];
+        }
+    }
+    sig = sig + this.options.appSecret;
+    return crypto.createHash('md5').update(sig, 'utf8').digest('hex');
+};
+
+/**
+ * Parse params from auth session data
+ *
+ * @param {String} data
+ *
+ * @returns {Object|Undefined}
+ * @private
+ */
+VK.prototype._parseSessionData = function(data) {
+    var items = data.split('&'),
+        validKeys = ['expire', 'mid', 'secret', 'sid', 'sig'],
+        parsedData = {},
+        item,
+        key,
+        k;
+
+    for (k in items) {
+
+        item = items[k].split('=');
+        key = item[0];
+
+        if (this.isEmpty(key) || this.isEmpty(item[1]) || validKeys.indexOf(key) === -1) {
+            return;
+        }
+
+        parsedData[key] = item[1];
+    }
+
+    for (k in validKeys) {
+        if (typeof parsedData[validKeys[k]] === 'undefined') {
+            return;
+        }
+    }
+
+    return this.sortObjectByKey(parsedData);
+};
