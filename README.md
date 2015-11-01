@@ -142,6 +142,15 @@ vk.on('http-error', function(_e) {
 });
 ```
 
+# JSON parsing errors
+SDK emits 'parse-error' event in case of non-valid API answer.
+
+```js
+vk.on('parse-error', function(_e) {
+    console.log(_e);
+});
+```
+
 SDK provides all methods from [events.EventEmitter](http://nodejs.org/api/events.html)
 
 # Bonus
