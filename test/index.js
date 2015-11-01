@@ -121,8 +121,8 @@ describe('basicSdk', function() {
       vk.request('users.get', {'user_id' : 1}, function(_o) {
         //console.log(_o);
         assert.equal(_o.response[0].id,  1);
-        assert.equal(_o.response[0].first_name,  'Pavel');
-        assert.equal(_o.response[0].last_name,  'Durov');
+        assert.ok(['Павел', 'Pavel'].indexOf(_o.response[0].first_name) !== -1);
+        assert.ok(['Дуров', 'Durov'].indexOf(_o.response[0].last_name) !== -1);
         done();
       });
     });
