@@ -281,15 +281,20 @@ VK.prototype.request = function(_method, _requestParams, _response) {
         });
 
         res.on('end', function() {
+          try {
             var o = JSON.parse(apiResponse);
-            if (responseType === 'callback' && typeof _response === 'function') {
-                _response(o);
-            } else {
-                if (responseType === 'event' && !!_response) {
-                    return self.emit(_response, o);
-                }
-                return self.emit('done:' + _method, o);
-            }
+          } catch(e) {
+              return self.emit('parse-error', apiResponse);
+          }
+
+          if (responseType === 'callback' && typeof _response === 'function') {
+              _response(o);
+          } else {
+              if (responseType === 'event' && !!_response) {
+                  return self.emit(_response, o);
+              }
+              return self.emit('done:' + _method, o);
+          }
         });
     }).on('error', function (e) {
         self.emit('http-error', e);
@@ -523,3 +528,4 @@ VK.prototype._parseSessionData = function(data) {
 
     return this.sortObjectByKey(parsedData);
 };
+
