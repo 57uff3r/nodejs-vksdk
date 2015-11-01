@@ -177,7 +177,7 @@ VK.prototype.oldRequest = function(_method, _requestParams, _response) {
     params.v               = '3.0';
     params.lang            = ('lang' in params) ? params['lang'] :  this.options.language ||  this.default.language;
     params.method          = _method;
-    params.timestamp        = new Date().getTime();
+    params.timestamp        = Math.round(new Date().getTime() / 1000);
     params.format          = 'json';
     params.random          = Math.floor(Math.random() * 9999);
 
