@@ -158,7 +158,6 @@ describe('basicSdk', function() {
         vk.setVersion('5.27');
         vk.request('secure.getAppBalance');
         vk.on('done:secure.getAppBalance', function(_o) {
-          console.log(_o);
           assert.equal(_o.error.error_code,  500);
           done();
         });
