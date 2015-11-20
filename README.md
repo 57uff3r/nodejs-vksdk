@@ -36,7 +36,7 @@ vk.request('secure.getSMSHistory', {}, function(_dd) {
 /**
  * Request client methods
  */
-// First you have to pass access_token from client side SJ code
+// First you have to pass access_token from client side JS code
 vk.setToken(access_token);
 
 // Request 'users.get' method
