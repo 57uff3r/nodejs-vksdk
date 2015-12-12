@@ -47,6 +47,8 @@ function VK(_options) {
 
     this.options = this.extend(this.options, _options);
 
+    this.reqLastTime = new Date(0)
+    this.requestingNow = false
 }
 
 
@@ -148,6 +150,15 @@ VK.prototype.setToken = function(_t) {
     return true;
 };
 
+VK.prototype.waitForNextRequest = function (_cb) {
+    var self = this;
+
+    if (new Date() - this.reqLastTime > 334 && !this.requestingNow) {
+        _cb();
+    } else setTimeout(function () {
+        self.waitForNextRequest(_cb);
+    }, 50);
+};
 
 /**
  * =========================== Dealing with api
@@ -268,36 +279,41 @@ VK.prototype.request = function(_method, _requestParams, _response) {
         }
     };
 
-    var post_req = https.request(options, function(res) {
-        var apiResponse = "";
-        res.setEncoding('utf8');
+    this.waitForNextRequest(function () {
+        self.requestingNow = true;
+        var post_req = https.request(options, function(res) {
+            var apiResponse = "";
+            res.setEncoding('utf8');
 
-        res.on('data', function(chunk) {
-            apiResponse += chunk;
-        });
+            res.on('data', function(chunk) {
+                apiResponse += chunk;
+            });
 
-        res.on('end', function() {
-          try {
-            var o = JSON.parse(apiResponse);
-          } catch(e) {
-              return self.emit('parse-error', apiResponse);
-          }
-
-          if (responseType === 'callback' && typeof _response === 'function') {
-              _response(o);
-          } else {
-              if (responseType === 'event' && !!_response) {
-                  return self.emit(_response, o);
+            res.on('end', function() {
+              self.reqLastTime = new Date();
+              self.requestingNow = false;
+              try {
+                var o = JSON.parse(apiResponse);
+              } catch(e) {
+                  return self.emit('parse-error', apiResponse);
               }
-              return self.emit('done:' + _method, o);
-          }
-        });
-    }).on('error', function (e) {
-        self.emit('http-error', e);
-    });
 
-    post_req.write(requestString);
-    post_req.end();
+              if (responseType === 'callback' && typeof _response === 'function') {
+                  _response(o);
+              } else {
+                  if (responseType === 'event' && !!_response) {
+                      return self.emit(_response, o);
+                  }
+                  return self.emit('done:' + _method, o);
+              }
+            });
+        }).on('error', function (e) {
+            self.emit('http-error', e);
+        });
+
+        post_req.write(requestString);
+        post_req.end();
+    })
 };
 
 /**
