@@ -45,10 +45,6 @@ function VK(_options) {
         throw 'nodejs-vk-sdk: you have to specify VK application id';
     }
 
-    if (!_options.hasOwnProperty('appSecret')) {
-        throw 'nodejs-vk-sdk: you have to specify VK application secret key';
-    }
-
     this.options = this.extend(this.options, _options);
 
 }
@@ -528,4 +524,3 @@ VK.prototype._parseSessionData = function(data) {
 
     return this.sortObjectByKey(parsedData);
 };
-
