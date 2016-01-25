@@ -178,4 +178,7 @@ You have to provide tests for the new features.
 * http://57uff3r.ru
 * http://vk.com/s7uff3r
 
+# Thanks to
+* [Alex0007](https://github.com/Alex0007)
+
 See  also vk.com [cities and counties DB](http://citieslist.ru/)
