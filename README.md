@@ -50,14 +50,14 @@ vk.request('users.get', {'user_id' : 1}, function(_o) {
 var VK = require('vksdk');
 
 var vk = new VK({
-    'appID'     : [Your application ID here],
+    'appId'     : [Your application ID here],
     'appSecret' : [Your application secret code here],
 });
 ```
 
 Required config options:
 * appSecret — application secret code (check your application settings on vk.com)
-* appID — vk.com application id
+* appId — vk.com application id
 
 Available config options:
 
