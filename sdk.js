@@ -38,11 +38,11 @@ function VK(_options) {
      * Setup config options
      */
     if (typeof(_options) != 'object' || this.isEmpty(_options)) {
-        throw 'nodejs-vk-sdk: you have to specify options in sdk constructor';
+        throw new Error('nodejs-vk-sdk: you have to specify options in sdk constructor');
     }
 
     if (!_options.hasOwnProperty('appId')) {
-        throw 'nodejs-vk-sdk: you have to specify VK application id';
+        throw new Error('nodejs-vk-sdk: you have to specify VK application id');
     }
 
     this.options = this.extend(this.options, _options);
