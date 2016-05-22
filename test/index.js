@@ -20,7 +20,7 @@ describe('basicSdk', function() {
   it('Should test getters and setters', function(done) {
 
     assert.doesNotThrow(function() {
-        assert.equal(vk.getVersion(), '5.27');
+        assert.equal(vk.getVersion(), '5.28');
     });
 
     assert.doesNotThrow(function() {
