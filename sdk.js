@@ -26,7 +26,7 @@ function VK(_options) {
         'appSecret' : false,
         'appId'     : false,
         'https'     : false,
-        'version'   : '5.27',
+        'version'   : '5.58',
         'language'  : 'ru',
         'secure'    : false
     };
@@ -308,6 +308,7 @@ VK.prototype.request = function(_method, _requestParams, _response) {
               }
             });
         }).on('error', function (e) {
+            self.requestingNow = false;
             self.emit('http-error', e);
         });
 
