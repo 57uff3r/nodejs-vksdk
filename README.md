@@ -131,7 +131,7 @@ vk.on('serverTokenReady', function(_o) {
 });
 ```
 
-You also can get tokeb with callback or custom event
+You also can get token with callback or custom event
 
 # HTTP errors
 SDK emits 'http-error' event in case of http errors.
