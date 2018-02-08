@@ -2,6 +2,8 @@ promise-vksdk
 ============
 Small SDK for vk.com API.
 
+This is form of vksdk, with Promise
+
 # Installation
     npm install promise-vksdk
 
