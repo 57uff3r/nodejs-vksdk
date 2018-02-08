@@ -297,6 +297,7 @@ VK.prototype.request = function(_method, _requestParams, _response) {
                 var o = JSON.parse(apiResponse);
               } catch(e) {
                   self.emit('parse-error', apiResponse);
+                  reject('parse-error', apiResponse);
               }
 
               if (responseType === 'callback' && typeof _response === 'function') {
@@ -313,6 +314,7 @@ VK.prototype.request = function(_method, _requestParams, _response) {
         }).on('error', function (e) {
             self.requestingNow = false;
             self.emit('http-error', e);
+            reject('http-error', e);
         });
 
         post_req.write(requestString);
