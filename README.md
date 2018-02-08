@@ -1,14 +1,14 @@
-nodejs-vksdk
+promise-vksdk
 ============
 Small SDK for vk.com API.
 
 # Installation
-    npm install vksdk
+    npm install promise-vksdk
 
 # Example
 ```js
 // Setup
-var VK = require('vksdk');
+var VK = require('promise-vksdk');
 var vk = new VK({
    'appId'     : 2807970,
    'appSecret' : 'L14ZKpgQPalJdumI6vFK',
@@ -29,9 +29,14 @@ vk.on('serverTokenReady', function(_o) {
 vk.setSecureRequests(true);
 
 // Request server API method
-vk.request('secure.getSMSHistory', {}, function(_dd) {
-    console.log(_dd);
+let vksdk = require('promise-vksdk');
+const vk = new vksdk({
+   'appId'     : 2807970,
+   'appSecret' : 'L14ZKpgQPalJdumI6vFK',
+   'lang'  : 'ru'
 });
+
+vk.request("users.get", {user_id:1}).then(o=>console.log(o));
 
 /**
  * Request client methods
@@ -40,14 +45,12 @@ vk.request('secure.getSMSHistory', {}, function(_dd) {
 vk.setToken(access_token);
 
 // Request 'users.get' method
-vk.request('users.get', {'user_id' : 1}, function(_o) {
-    console.log(_o);
-});
+vk.request("users.get", {user_id:1}).then(o=>console.log(o));
 ```
 
 # Setup
 ```js
-var VK = require('vksdk');
+var VK = require('promise-vksdk');
 
 var vk = new VK({
     'appId'     : [Your application ID here],
@@ -83,40 +86,12 @@ For vk.com API requests you have to use method *request(_method, _requestParams,
 
 * **[string] _method** — name of vk.com API method,
 * **[mixed] _requestParams** - object with values of params for api method. This param is not required. You also can pass empty object *{}*
-* **[mixed] _response** — special response handler (not required), function or event name.
 
 Request method gets data from API and returns result. There are 3 ways to get data from API
 
-## Callback
-```js
-vk.setSecureRequests(false);
-vk.request('users.get', {'user_id' : 1}, function(_o) {
-console.log(_o);
-});
-```
 
-## Event
-After success API call SDK emits the event named 'done:' + _method;
-So if you call method *users.get*, you have to wait event *done:users.get*
 
-```js
-vk.setSecureRequests(false);
-vk.request('users.get', {'user_id' : 1});
-vk.on('done:users.get', function(_o) {
-    console.log(_o);
-});
-```
 
-## Custom event
-Result of request will be returned with your custom event
-
-```js
-vk.setSecureRequests(false);
-vk.request('users.get', {'user_id' : 1}, 'myCustomEvent');
-vk.on('myCustomEvent', function(_o) {
-    console.log(_o);
-});
-```
 
 # Server access token
 For some api methods you need server access token

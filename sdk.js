@@ -230,41 +230,38 @@ VK.prototype.oldRequest = function(_method, _requestParams, _response) {
  * Request API method
  * @param {string} _method
  * @param {mixed} _params
- * @param {mixed} _response
  * @returns {mixed}
  *
  * @see https://vk.com/pages?oid=-17680044&p=Application_Interaction_with_API
  */
-VK.prototype.request = function(_method, _requestParams, _response) {
-    var responseType = 'event';
-
-    if ( typeof(_response) === 'function') {
-        responseType = 'callback';
-    }
-
+VK.prototype.request = function(_method, _requestParams) {
+    let thats = this;
     var self = this;
+    return new Promise(function(resolve,reject){
+        var responseType = 'event';
+
 
     var params = {
-        'lang'  : this.options.lang,
-        'v'     : this.options.version,
-        'https' : (this.options.https) ? 1 : 0
+        'lang'  : thats.options.lang,
+        'v'     : thats.options.version,
+        'https' : (thats.options.https) ? 1 : 0
     };
 
-    if (this.isEmpty(_requestParams) === false) {
+    if (thats.isEmpty(_requestParams) === false) {
         for (var i in _requestParams) {
             params[i] = _requestParams[i];
         }
     }
 
-    var requestString = this.buildQuery(params);
+    var requestString = thats.buildQuery(params);
 
-    if (this.options.secure) {
-        if (this.token) {
-            requestString = requestString + '&access_token=' + this.token;
+    if (thats.options.secure) {
+        if (thats.token) {
+            requestString = requestString + '&access_token=' + thats.token;
         }
 
-        if (this.options.appSecret) {
-            requestString = requestString + '&client_secret=' + this.options.appSecret;
+        if (thats.options.appSecret) {
+            requestString = requestString + '&client_secret=' + thats.options.appSecret;
         }
     }
 
@@ -279,7 +276,7 @@ VK.prototype.request = function(_method, _requestParams, _response) {
         }
     };
 
-    this.waitForNextRequest(function () {
+    thats.waitForNextRequest(function () {
         self.requestingNow = true;
         var post_req = https.request(options, function(res) {
             var apiResponse = "";
@@ -295,17 +292,10 @@ VK.prototype.request = function(_method, _requestParams, _response) {
               try {
                 var o = JSON.parse(apiResponse);
               } catch(e) {
-                  return self.emit('parse-error', apiResponse);
+                  self.emit('parse-error', apiResponse);
               }
 
-              if (responseType === 'callback' && typeof _response === 'function') {
-                  _response(o);
-              } else {
-                  if (responseType === 'event' && !!_response) {
-                      return self.emit(_response, o);
-                  }
-                  return self.emit('done:' + _method, o);
-              }
+             resolve(o);
             });
         }).on('error', function (e) {
             self.requestingNow = false;
@@ -315,6 +305,8 @@ VK.prototype.request = function(_method, _requestParams, _response) {
         post_req.write(requestString);
         post_req.end();
     })
+    });
+    
 };
 
 /**
