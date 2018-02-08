@@ -234,11 +234,15 @@ VK.prototype.oldRequest = function(_method, _requestParams, _response) {
  *
  * @see https://vk.com/pages?oid=-17680044&p=Application_Interaction_with_API
  */
-VK.prototype.request = function(_method, _requestParams) {
+VK.prototype.request = function(_method, _requestParams, _response) {
     let thats = this;
     var self = this;
     return new Promise(function(resolve,reject){
         var responseType = 'event';
+
+        if ( typeof(_response) === 'function') {
+          responseType = 'callback';
+        }
 
 
     var params = {
@@ -293,6 +297,15 @@ VK.prototype.request = function(_method, _requestParams) {
                 var o = JSON.parse(apiResponse);
               } catch(e) {
                   self.emit('parse-error', apiResponse);
+              }
+
+              if (responseType === 'callback' && typeof _response === 'function') {
+                  _response(o);
+              } else {
+                  if (responseType === 'event' && !!_response) {
+                      return self.emit(_response, o);
+                  }
+                  return self.emit('done:' + _method, o);
               }
 
              resolve(o);

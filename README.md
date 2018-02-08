@@ -86,11 +86,40 @@ For vk.com API requests you have to use method *request(_method, _requestParams,
 
 * **[string] _method** — name of vk.com API method,
 * **[mixed] _requestParams** - object with values of params for api method. This param is not required. You also can pass empty object *{}*
-
+* **[mixed] _response** — special response handler (not required), function or event name.
 Request method gets data from API and returns result. There are 3 ways to get data from API
 
 
+## Callback
+```js
+vk.setSecureRequests(false);
+vk.request('users.get', {'user_id' : 1}, function(_o) {
+console.log(_o);
+});
+```
 
+## Event
+After success API call SDK emits the event named 'done:' + _method;
+So if you call method *users.get*, you have to wait event *done:users.get*
+
+```js
+vk.setSecureRequests(false);
+vk.request('users.get', {'user_id' : 1});
+vk.on('done:users.get', function(_o) {
+    console.log(_o);
+});
+```
+
+## Custom event
+Result of request will be returned with your custom event
+
+```js
+vk.setSecureRequests(false);
+vk.request('users.get', {'user_id' : 1}, 'myCustomEvent');
+vk.on('myCustomEvent', function(_o) {
+    console.log(_o);
+});
+```
 
 
 # Server access token
