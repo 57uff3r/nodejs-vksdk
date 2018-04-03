@@ -1,8 +1,8 @@
 {
-  "name": "vksdk",
-  "description": "SDK for API of vk.com",
+  "name": "promise-vksdk",
+  "description": "SDK for API of vk.com with Promise",
   "version": "5.3.2",
-  "homepage": "https://github.com/57uff3r/nodejs-vksdk",
+  "homepage": "https://github.com/DuckerMan/promise-vksdk",
   "email": "57uff3r@gmail.com",
   "license": "BSD-3-Clause",
   "main": "sdk.js",
@@ -11,16 +11,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/57uff3r/nodejs-vksdk.git"
+    "url": "https://github.com/DuckerMan/promise-vksdk.git"
   },
   "keywords": [
     "vk",
     "vkontakte",
     "sdk"
   ],
-  "author": "Andrey Korchak <57uff3r@gmail.com> (http://57uff3r.ru/)",
+  "author": "DuckerMan | Andrey Korchak",
   "bugs": {
-    "url": "https://github.com/57uff3r/nodejs-vksdk/issues"
+    "url": "https://github.com/DuckerMan/promise-vksdk/issues"
   },
   "devDependencies": {
     "chai": "^3.4.0",

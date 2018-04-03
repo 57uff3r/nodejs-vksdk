@@ -1,14 +1,16 @@
-nodejs-vksdk
+promise-vksdk
 ============
 Small SDK for vk.com API.
 
+This is form of vksdk, with Promise
+
 # Installation
-    npm install vksdk
+    npm install promise-vksdk
 
 # Example
 ```js
 // Setup
-var VK = require('vksdk');
+var VK = require('promise-vksdk');
 var vk = new VK({
    'appId'     : 2807970,
    'appSecret' : 'L14ZKpgQPalJdumI6vFK',
@@ -29,9 +31,14 @@ vk.on('serverTokenReady', function(_o) {
 vk.setSecureRequests(true);
 
 // Request server API method
-vk.request('secure.getSMSHistory', {}, function(_dd) {
-    console.log(_dd);
+let vksdk = require('promise-vksdk');
+const vk = new vksdk({
+   'appId'     : 2807970,
+   'appSecret' : 'L14ZKpgQPalJdumI6vFK',
+   'lang'  : 'ru'
 });
+
+vk.request("users.get", {user_id:1}).then(o=>console.log(o));
 
 /**
  * Request client methods
@@ -40,14 +47,12 @@ vk.request('secure.getSMSHistory', {}, function(_dd) {
 vk.setToken(access_token);
 
 // Request 'users.get' method
-vk.request('users.get', {'user_id' : 1}, function(_o) {
-    console.log(_o);
-});
+vk.request("users.get", {user_id:1}).then(o=>console.log(o));
 ```
 
 # Setup
 ```js
-var VK = require('vksdk');
+var VK = require('promise-vksdk');
 
 var vk = new VK({
     'appId'     : [Your application ID here],
@@ -84,8 +89,8 @@ For vk.com API requests you have to use method *request(_method, _requestParams,
 * **[string] _method** — name of vk.com API method,
 * **[mixed] _requestParams** - object with values of params for api method. This param is not required. You also can pass empty object *{}*
 * **[mixed] _response** — special response handler (not required), function or event name.
-
 Request method gets data from API and returns result. There are 3 ways to get data from API
+
 
 ## Callback
 ```js
@@ -118,6 +123,7 @@ vk.on('myCustomEvent', function(_o) {
 });
 ```
 
+
 # Server access token
 For some api methods you need server access token
 
@@ -131,7 +137,12 @@ vk.on('serverTokenReady', function(_o) {
 });
 ```
 
-You also can get tokeb with callback or custom event
+You also can get token with callback or custom event
+#Errors:
+
+```js
+vk.request("users.get", {user_id:1}).then(o=>console.log(o)).catch(err=>console.error(err));
+```
 
 # HTTP errors
 SDK emits 'http-error' event in case of http errors.
