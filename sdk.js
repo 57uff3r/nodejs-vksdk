@@ -302,6 +302,7 @@ VK.prototype.request = function(_method, _requestParams, _response) {
 
               if (responseType === 'callback' && typeof _response === 'function') {
                   _response(o);
+                  resolve(o)
               } else {
                   if (responseType === 'event' && !!_response) {
                       return self.emit(_response, o);
