@@ -549,7 +549,7 @@ VK.prototype._parseSessionData = function(data) {
  * @param {string} _method
  * @param {mixed} _params
  * @param {mixed} _response
- * @returns {mixed}
+ * @returns {Promise}
  *
  * @see https://vk.com/pages?oid=-17680044&p=Application_Interaction_with_API
  */
