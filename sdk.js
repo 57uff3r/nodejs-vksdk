@@ -555,72 +555,12 @@ VK.prototype._parseSessionData = function(data) {
  */
 VK.prototype.promise = function(_method, _requestParams) {
     return new Promise((resolve,reject)=>{
-
-        var self = this;
-
-        var params = {
-            'lang'  : this.options.lang,
-            'v'     : this.options.version,
-            'https' : (this.options.https) ? 1 : 0
-        };
-
-        if (this.isEmpty(_requestParams) === false) {
-            for (var i in _requestParams) {
-                params[i] = _requestParams[i];
+        this.request(_method,_params,(res)=>{
+            if(res.error) {
+                reject(res.error)
+            } else {
+                resolve(res);
             }
-        }
-
-        var requestString = this.buildQuery(params);
-
-        if (this.options.secure) {
-            if (this.token) {
-                requestString = requestString + '&access_token=' + this.token;
-            }
-
-            if (this.options.appSecret) {
-                requestString = requestString + '&client_secret=' + this.options.appSecret;
-            }
-        }
-
-        var options = {
-            host: 'api.vk.com',
-            port: 443,
-            path: '/method/' + _method ,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Content-Length': requestString.length
-            }
-        };
-
-        this.waitForNextRequest(function () {
-            self.requestingNow = true;
-            var post_req = https.request(options, function(res) {
-                var apiResponse = "";
-                res.setEncoding('utf8');
-
-                res.on('data', function(chunk) {
-                    apiResponse += chunk;
-                });
-
-                res.on('end', function() {
-                self.reqLastTime = new Date();
-                self.requestingNow = false;
-                try {
-                    var o = JSON.parse(apiResponse);
-                } catch(e) {
-                    return reject('parse-error', apiResponse);
-                }
-
-                resolve(o);
-                });
-            }).on('error', function (e) {
-                self.requestingNow = false;
-                reject('http-error', e);
-            });
-
-            post_req.write(requestString);
-            post_req.end();
         })
     })
 };
